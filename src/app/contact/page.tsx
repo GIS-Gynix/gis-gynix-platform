@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Send, Terminal, User, Mail, 
-  Briefcase, MessageSquare, CheckCircle2, Sliders 
+  Briefcase, MessageSquare, CheckCircle2, Sliders, FileText, Activity 
 } from "lucide-react";
 
 export default function ContactPage() {
@@ -27,28 +27,26 @@ export default function ContactPage() {
     setSubmitted(true);
   };
 
-  // Auto-serializing data into a live system payload preview string
-  const generateLivePayload = () => {
-    return JSON.stringify({
-      routing_target: "GIS_GYNIX_INBOUND",
-      timestamp: new Date().toISOString().split('T')[0],
-      client_telemetry: {
-        origin_name: formData.name || "NULL",
-        comms_channel: formData.email || "NULL"
-      },
-      allocation_parameters: {
-        operation_sector: formData.sector.toUpperCase(),
-        projected_lifecycle: formData.timeline,
-        structural_manifesto_length: formData.details.length
-      }
-    }, null, 2);
+  // Human-readable labels lookup matrix
+  const sectorNames: Record<string, string> = {
+    webgis: "Cloud WebGIS Application Development",
+    zoning: "USA Zoning & Parcel Analysis Platform",
+    "remote-sensing": "Remote Sensing & Satellite AI Analysis",
+    automation: "Custom Python Spatial Scripting & Pipelines"
+  };
+
+  const timelineNames: Record<string, string> = {
+    urgent: "Ad-Hoc / Rapid Support Sprint",
+    "1-month": "1-Month Development Cycle",
+    "3-months": "3.5-Month Milestone Contract (Fiverr/Upwork)",
+    retainer: "Long-Term Agency Developer Retainer"
   };
 
   return (
-    <div className="w-full bg-spatial-grid min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div className="w-full bg-spatial-grid min-h-screen pt-28 pb-12 px-4 sm:px-6 lg:px-8">
       
       {/* Informative Portal Heading */}
-      <section className="max-w-4xl mx-auto text-center mt-8 mb-12 space-y-4">
+      <section className="max-w-4xl mx-auto text-center mb-12 space-y-4">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -64,15 +62,15 @@ export default function ContactPage() {
           <span className="bg-clip-text text-transparent bg-gradient-spatial">Initialize System Calibration</span>
         </h1>
         <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
-          Submit your scope parameters below. Our global database engineering and web mapping coordination team typically responds with complete system specifications within 24 operational hours.
+          Submit your scope parameters below. Our web mapping and remote sensing coordination team typically responds with complete system specifications within 24 operational hours.
         </p>
       </section>
 
       {/* Main Dual-Pane Console Layout Grid */}
-      <section className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-20">
+      <section className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch mb-20">
         
         {/* Left Interactive Input Form Card */}
-        <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/30 dark:bg-brand-surface/30 shadow-2xl relative">
+        <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/30 dark:bg-brand-surface/30 shadow-2xl relative flex flex-col justify-between">
           <AnimatePresence mode="wait">
             {!submitted ? (
               <motion.form 
@@ -182,14 +180,14 @@ export default function ContactPage() {
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="py-12 text-center space-y-4 flex flex-col items-center justify-center"
+                className="py-12 text-center space-y-4 flex flex-col items-center justify-center my-auto"
               >
-                <div className="w-16 h-16 rounded-full bg-brand-emerald/10 text-brand-emerald flex items-center justify-center animate-bounce-slow">
+                <div className="w-16 h-16 rounded-full bg-brand-emerald/10 text-brand-emerald flex items-center justify-center">
                   <CheckCircle2 size={36} />
                 </div>
                 <h3 className="text-2xl font-sans font-black text-slate-900 dark:text-white">Transmission Successful</h3>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed mx-auto">
-                  Your spatial pipeline project manifest has been safely encrypted, mapped into structural geoJSON indices, and synchronized directly with our primary retainer tracking system.
+                  Your spatial project manifest has been safely encrypted and synchronized directly with the tracking queue.
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}
@@ -202,31 +200,67 @@ export default function ContactPage() {
           </AnimatePresence>
         </div>
 
-        {/* Right Automated Terminal Output Code Stream Panel */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-900 bg-slate-950 p-5 shadow-2xl h-[470px] flex flex-col overflow-hidden relative group">
-          {/* Header Bar */}
-          <div className="flex items-center justify-between pb-3 border-b border-slate-900 text-xs font-mono text-slate-500 shrink-0">
-            <div className="flex items-center space-x-2">
-              <Terminal size={14} className="text-brand-emerald" />
-              <span className="font-bold tracking-tight text-slate-400">gynix_api_pipeline.json</span>
+        {/* Right Automated Clear Specification Summary Panel */}
+        <div className="glass-panel rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-900/40 p-6 shadow-2xl flex flex-col justify-between relative group">
+          <div className="space-y-6">
+            {/* Header Title segment */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 text-xs font-mono">
+              <div className="flex items-center space-x-2 text-slate-800 dark:text-white">
+                <FileText size={16} className="text-brand-emerald" />
+                <span className="font-bold uppercase tracking-wider">Live Project Scope Breakdown</span>
+              </div>
+              <div className="flex items-center space-x-1.5 text-slate-400">
+                <Activity size={12} className="text-brand-cyan animate-pulse" />
+                <span className="text-[10px] tracking-widest uppercase">Live Tracking</span>
+              </div>
             </div>
-            <div className="flex space-x-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500/60" />
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
-              <span className="w-2.5 h-2.5 rounded-full bg-brand-emerald/60" />
+
+            {/* Structured Readable Data Breakdown */}
+            <div className="space-y-5 font-sans">
+              <div className="space-y-1">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Prospective Client</span>
+                <p className="text-base font-extrabold text-slate-900 dark:text-white transition-all">
+                  {formData.name || <span className="text-slate-500 font-normal italic">Awaiting entry...</span>}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Communication Channel</span>
+                <p className="text-base font-medium font-mono text-brand-cyan break-all">
+                  {formData.email || <span className="text-slate-500 font-sans font-normal italic">Awaiting entry...</span>}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Selected Project Domain</span>
+                <p className="text-base font-bold text-slate-900 dark:text-brand-emerald">
+                  {sectorNames[formData.sector]}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Development Lifecycle</span>
+                <p className="text-base font-bold text-slate-900 dark:text-white">
+                  {timelineNames[formData.timeline]}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Scope Specifications Manifest</span>
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-h-32 overflow-y-auto scrollbar-none bg-slate-950/20 p-3 rounded-xl border border-slate-200 dark:border-slate-800/60 min-h-[64px]">
+                  {formData.details || <span className="text-slate-500 italic">No notes provided yet. Write your details in the description field...</span>}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Running Monospaced Payload Code Logger */}
-          <div className="flex-grow pt-4 overflow-y-auto font-mono text-xs text-brand-cyan leading-relaxed whitespace-pre bg-slate-950/40 select-all scrollbar-none">
-            {generateLivePayload()}
-          </div>
-
-          {/* Absolute Background Corner Encryption Status Badge */}
-          <div className="absolute bottom-4 right-4 text-[9px] font-mono tracking-widest text-slate-700 group-hover:text-slate-500 uppercase transition-colors pointer-events-none">
-            Status: SSL_256_ACTIVE
+          {/* Secure Assurance Indicator Footer Badge */}
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 mt-6 flex items-center justify-between text-[11px] font-mono text-slate-400">
+            <span>PIPELINE ENGINE V1.0</span>
+            <span className="text-brand-emerald font-bold">● SYSTEM OPERATIONAL</span>
           </div>
         </div>
+
       </section>
     </div>
   );
