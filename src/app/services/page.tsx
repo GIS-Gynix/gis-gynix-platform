@@ -1,124 +1,49 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { 
-  Layers, Globe, Database, Cpu, 
-  MapPin, Radio, Zap, ChevronRight, CheckCircle2 
+  Layers, Map, ShieldCheck, Database, 
+  Terminal, Globe, Cpu, ArrowUpRight 
 } from "lucide-react";
-import Link from "next/link";
 
 export default function ServicesPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-
-  const serviceCatalog = [
+  const servicesList = [
     {
-      id: "spatial-analysis",
-      category: "core",
-      title: "Advanced Spatial Analysis",
-      icon: Layers,
-      description: "Complex vector and raster vector processing algorithms designed to extract actionable intelligence from geographic layers.",
-      subServices: [
-        "Hydrological Modeling & Flood Risk Mapping",
-        "Multi-Criteria Suitability Analysis",
-        "DEM, SRTM, and LiDAR Processing",
-        "High-fidelity Map Design & Cartography"
-      ],
-      color: "text-brand-emerald",
-      borderGlow: "hover:border-brand-emerald/30"
+      id: "zoning",
+      title: "USA Zoning Intelligence & Parcel Analysis",
+      icon: <Layers className="w-6 h-6 text-brand-cyan" />,
+      description: "Comprehensive parsing and extraction of municipal ordinances, overlay boundaries, and real estate lot telemetry. Ideal for developers navigating complex urban development requirements.",
+      features: ["Zoning Classification Extraction", "Lot-Level GIS Telemetry Maps", "Setback & Building Height Analysis", "Municipal Rule Digitization Matrix"],
     },
     {
-      id: "webgis-development",
-      category: "dev",
-      title: "Cloud WebGIS Development",
-      icon: Globe,
-      description: "Low-latency custom interactive map web applications optimized for speed, streaming data, and massive vector datasets.",
-      subServices: [
-        "Custom MapLibre GL & Mapbox GL Frontends",
-        "GeoServer Orchestration & Layer Tuning",
-        "PostGIS Spatial Database Performance Indexing",
-        "Real-time Dashboard Analytics Infrastructure"
-      ],
-      color: "text-brand-cyan",
-      borderGlow: "hover:border-brand-cyan/30"
+      id: "webgis",
+      title: "Enterprise WebGIS Solutions & Mapping Portals",
+      icon: <Globe className="w-6 h-6 text-brand-emerald" />,
+      description: "Custom cloud-native web mapping dashboards crafted with high-performance vector rendering. Designed to provide beautiful, responsive visual workflows for internal teams and clients.",
+      features: ["Vector Tile Asset Styling", "Interactive Mapbox/Leaflet Interfaces", "Spatial Filtering & Custom Buffers", "ArcGIS Dashboard Integrations"],
     },
     {
       id: "remote-sensing",
-      category: "core",
-      title: "Remote Sensing & Geospatial AI",
-      icon: Cpu,
-      description: "Automated imagery classification and analysis pipelines driven by machine learning model frameworks.",
-      subServices: [
-        "Land Use Land Cover (LULC) Change Detection",
-        "Google Earth Engine Large Scale Automation",
-        "Satellite Imagery Sub-pixel Feature Extraction",
-        "Multispectral & Hyperspectral Matrix Analytics"
-      ],
-      color: "text-brand-accent",
-      borderGlow: "hover:border-brand-accent/30"
+      title: "Remote Sensing & Satellite Image Processing",
+      icon: <Map className="w-6 h-6 text-brand-accent" />,
+      description: "Advanced analysis of multi-spectral aerial and satellite datasets. We run automated workflows to extract environmental indicators, change-detection grids, and infrastructure metrics.",
+      features: ["NDVI & Land Cover Classification", "Multitemporal Change Detection", "Aerial Raster Geometry Orthomosaics", "Dem/TIN Elevation Computations"],
     },
     {
-      id: "zoning-intelligence",
-      category: "zoning",
-      title: "USA Zoning Intelligence",
-      icon: MapPin,
-      description: "Precise evaluation of municipal property code frameworks, parcel configurations, and structural constraints.",
-      subServices: [
-        "Detailed Zoning Verification Reports",
-        "Building Setback & Height Regulation Checks",
-        "Lot Coverage & Parking Ratio Analysis",
-        "Overlay District & Land Use Optimization"
-      ],
-      color: "text-amber-400",
-      borderGlow: "hover:border-amber-400/30"
-    },
-    {
-      id: "utility-mapping",
-      category: "core",
-      title: "Utility & FTTH Network Design",
-      icon: Zap,
-      description: "Fiber optic planning layouts, digital engineering drawings, and structural infrastructure assets cataloging.",
-      subServices: [
-        "FTTH Architecture Planning & Layouts",
-        "Telecommunications Asset Digitization",
-        "Georeferencing & Cadastral Database Integration",
-        "As-Built Utility Connectivity Mapping"
-      ],
-      color: "text-purple-400",
-      borderGlow: "hover:border-purple-400/30"
-    },
-    {
-      id: "spatial-apis",
-      category: "dev",
-      title: "Python Automation & Spatial APIs",
-      icon: Database,
-      description: "Automating repetitive data handling pipelines and delivering fast, flexible custom geoJSON data structures.",
-      subServices: [
-        "GDAL / Fiona / Shapely Script Toolkits",
-        "Automated Shapefile Vector Extraction Layers",
-        "Custom RESTful GeoJSON API Endpoint Deployments",
-        "Batch Spatial Processing ETL Orchestrations"
-      ],
-      color: "text-rose-400",
-      borderGlow: "hover:border-rose-400/30"
+      id: "automation",
+      title: "Spatial Data Engineering & Scripting Pipelines",
+      icon: <Terminal className="w-6 h-6 text-brand-cyan" />,
+      description: "High-volume spatial ETL pipelines designed to automate geometric cleanups, attribute merges, and database transfers. We eliminate tedious manual file processes.",
+      features: ["PostGIS Vector Query Speedups", "Custom QGIS Python Toolsets", "GeoJSON/Shapefile Bulk Conversion", "Automated Raster Compression Runs"],
     }
   ];
 
-  const categories = [
-    { label: "All Sectors", value: "all" },
-    { label: "Core Analytics", value: "core" },
-    { label: "WebGIS & Development", value: "dev" },
-    { label: "Zoning Solutions", value: "zoning" }
-  ];
-
-  const filteredServices = selectedCategory === "all" 
-    ? serviceCatalog 
-    : serviceCatalog.filter(s => s.category === selectedCategory);
-
   return (
-    <div className="w-full bg-spatial-grid min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      {/* Dynamic Structural Heading */}
-      <section className="max-w-4xl mx-auto text-center mt-8 mb-12 space-y-4">
+    <div className="w-full bg-spatial-grid min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8">
+      
+      {/* Services Section Header Briefing */}
+      <section className="max-w-4xl mx-auto text-center mb-16 space-y-4">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -126,92 +51,95 @@ export default function ServicesPage() {
         >
           <span className="w-1.5 h-1.5 rounded-full bg-brand-emerald" />
           <span className="text-[11px] font-mono uppercase tracking-widest text-slate-600 dark:text-slate-400">
-            Capability Index
+            Professional Capabilities Matrix
           </span>
         </motion.div>
+        
         <h1 className="text-4xl sm:text-5xl font-sans font-black text-slate-900 dark:text-white tracking-tight">
-          Enterprise Geospatial Services <br />
-          <span className="bg-clip-text text-transparent bg-gradient-spatial">Engineered for Scale</span>
+          Core Services & Solutions <br />
+          <span className="bg-clip-text text-transparent bg-gradient-spatial">Geospatial Operations</span>
         </h1>
         <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
-          We combine physical spatial data parameters with flexible cloud pipelines, providing precise maps, metrics, and data structures.
+          Explore specialized engineering categories provided by GIS Gynix. Click on any capability to load a tailored system configuration request pipeline directly routed to our inbox.
         </p>
       </section>
 
-      {/* Interactive Filtering Navigation */}
-      <section className="max-w-3xl mx-auto flex flex-wrap justify-center gap-2 mb-16">
-        {categories.map((cat) => (
-          <button
-            key={cat.value}
-            onClick={() => setSelectedCategory(cat.value)}
-            className={`px-4 py-2 rounded-lg font-sans text-xs sm:text-sm font-semibold tracking-wide transition-all duration-200 border ${
-              selectedCategory === cat.value
-                ? "bg-slate-900 dark:bg-white text-white dark:text-brand-dark border-transparent shadow-md"
-                : "bg-white/60 dark:bg-brand-surface/40 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800/80 hover:border-brand-cyan/40"
-            }`}
+      {/* Responsive Services Interactive Grid Panel */}
+      <section className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+        {servicesList.map((service, index) => (
+          <motion.div
+            key={service.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-brand-surface/20 hover:border-brand-cyan/40 dark:hover:border-brand-cyan/30 shadow-xl relative flex flex-col justify-between group transition-all duration-300"
           >
-            {cat.label}
-          </button>
-        ))}
-      </section>
-
-      {/* Main Services Capabilities Grid */}
-      <section className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-        {filteredServices.map((service, idx) => {
-          const Icon = service.icon;
-          return (
-            <motion.div
-              key={service.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-              className={`glass-panel p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-xl flex flex-col space-y-6 transition-all duration-300 transform hover:-translate-y-1 group bg-white/30 dark:bg-brand-surface/30 ${service.borderGlow}`}
-            >
-              {/* Card Header Structure */}
-              <div className="flex items-center space-x-4">
-                <div className={`w-12 h-12 rounded-xl bg-slate-100 dark:bg-brand-muted flex items-center justify-center ${service.color} group-hover:scale-110 transition-transform duration-300`}>
-                  <Icon size={24} />
+            <div className="space-y-6">
+              {/* Header Icon Segment */}
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center shadow-md">
+                  {service.icon}
                 </div>
-                <h3 className="text-lg sm:text-xl font-sans font-bold text-slate-900 dark:text-white leading-snug group-hover:text-brand-cyan transition-colors">
-                  {service.title}
-                </h3>
+                <span className="text-[10px] font-mono font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">
+                  Module-0{index + 1}
+                </span>
               </div>
 
-              {/* Description Context */}
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                {service.description}
-              </p>
+              {/* Title & Technical Explanations */}
+              <div className="space-y-2">
+                <h3 className="text-xl font-sans font-black text-slate-900 dark:text-white group-hover:text-brand-cyan transition-colors duration-200">
+                  {service.title}
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-sans font-medium">
+                  {service.description}
+                </p>
+              </div>
 
-              {/* Sub-Service Bullet Framework */}
-              <div className="space-y-2.5 flex-grow pt-2">
-                <h4 className="text-[10px] font-mono uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">
-                  Technical Deliverables
-                </h4>
-                <ul className="space-y-2">
-                  {service.subServices.map((sub, sIdx) => (
-                    <li key={sIdx} className="flex items-start space-x-2.5 text-xs font-medium text-slate-600 dark:text-slate-300">
-                      <CheckCircle2 size={14} className={`mt-0.5 shrink-0 ${service.color}`} />
-                      <span>{sub}</span>
+              {/* Key Deliverables Bullet Point Grid Matrix */}
+              <div className="space-y-2 pt-2">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block font-bold">
+                  Core Engineering Deliverables:
+                </span>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-sans font-medium text-slate-600 dark:text-slate-300">
+                  {service.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center space-x-2">
+                      <span className="w-1 h-1 rounded-full bg-brand-emerald" />
+                      <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
               </div>
+            </div>
 
-              {/* Bottom Interactive Trigger Anchor */}
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-800/60">
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center space-x-1.5 text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 hover:text-brand-cyan dark:hover:text-brand-emerald transition-colors"
-                >
-                  <span>Request Solution Spec</span>
-                  <ChevronRight size={14} className="transform group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              </div>
-            </motion.div>
-          );
-        })}
+            {/* Dynamic Link Redirect Button with New Tab Routing */}
+            <div className="pt-8 mt-auto">
+              <a
+                href={`/contact?service=${service.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-center py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-brand-dark text-white font-sans font-bold text-xs tracking-wider uppercase flex items-center justify-center space-x-2 shadow-lg hover:shadow-brand-cyan/10 transition-all duration-200 transform hover:-translate-y-0.5"
+              >
+                <span>Request {service.id === "zoning" ? "Zoning Analysis" : "Service"}</span>
+                <ArrowUpRight size={14} className="opacity-70" />
+              </a>
+            </div>
+          </motion.div>
+        ))}
       </section>
+
+      {/* Professional Infrastructure Quality Badge Footer */}
+      <section className="max-w-4xl mx-auto text-center mt-16 text-xs font-mono text-slate-400 flex flex-col sm:flex-row items-center justify-center gap-4 border-t border-slate-200 dark:border-slate-900 pt-8">
+        <div className="flex items-center space-x-2">
+          <ShieldCheck size={14} className="text-brand-emerald" />
+          <span>Full Ownership Handover</span>
+        </div>
+        <span className="hidden sm:inline text-slate-700">|</span>
+        <div className="flex items-center space-x-2">
+          <Database size={14} className="text-brand-cyan" />
+          <span>PostgreSQL / PostGIS Secure Stacks</span>
+        </div>
+      </section>
+
     </div>
   );
 }
