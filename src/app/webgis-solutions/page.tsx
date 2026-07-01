@@ -84,7 +84,8 @@ export default function WebGisSolutionsPage() {
     });
 
     return () => map.remove();
-  }, []);
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   // Sync state changes with internal map engines smoothly
   const handleBasemapChange = (styleKey: string) => {
