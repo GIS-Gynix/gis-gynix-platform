@@ -41,7 +41,7 @@ function ContactFormContent() {
     const formDataPayload = new FormData();
     
     // Append fields exactly as Web3Forms endpoints expect them
-    formDataPayload.append("access_key", "f837edd8-8269-4fe6-ad55-2b1bb8c93737");
+    formDataPayload.append("access_key", "53320008-e535-416d-900c-56474751f850");
     formDataPayload.append("name", formData.name);
     formDataPayload.append("email", formData.email);
     formDataPayload.append("service_requested", sectorNames[formData.sector]);
