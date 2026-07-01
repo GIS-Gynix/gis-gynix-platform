@@ -8,7 +8,6 @@ import {
   MessageSquare, CheckCircle2, Sliders, FileText, Activity 
 } from "lucide-react";
 
-// Wrap the actual form in a sub-component to handle search parameters cleanly in Next.js
 function ContactFormContent() {
   const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,7 +21,6 @@ function ContactFormContent() {
     details: ""
   });
 
-  // Automatically read the service parameter from the URL when a user clicks from the services page
   useEffect(() => {
     const serviceParam = searchParams.get("service");
     if (serviceParam) {
@@ -39,31 +37,34 @@ function ContactFormContent() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Prepare Web3Forms payload parameters
-    const payload = {
-      access_key: "f837edd8-8269-4fe6-ad55-2b1bb8c93737", // <-- Extracted directly from image_b7eede.png
-      name: formData.name,
-      email: formData.email,
-      service_requested: sectorNames[formData.sector],
-      timeline_target: timelineNames[formData.timeline],
-      message: formData.details,
-      subject: `New GIS Gynix Project Request from ${formData.name}`
-    };
+    // Create native browser FormData object for reliable transmission
+    const formDataPayload = new FormData();
+    
+    // Append fields exactly as Web3Forms endpoints expect them
+    formDataPayload.append("access_key", "f837edd8-8269-4fe6-ad55-2b1bb8c93737");
+    formDataPayload.append("name", formData.name);
+    formDataPayload.append("email", formData.email);
+    formDataPayload.append("service_requested", sectorNames[formData.sector]);
+    formDataPayload.append("timeline_target", timelineNames[formData.timeline]);
+    formDataPayload.append("message", formData.details);
+    formDataPayload.append("subject", `New GIS Gynix Project Request from ${formData.name}`);
 
     try {
+      // Send as multipart standard form data payload
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: formDataPayload,
       });
       
-      if (response.ok) {
+      const result = await response.json();
+      
+      if (result.success) {
         setSubmitted(true);
       } else {
-        alert("Transmission error. Please try again or email directly at gisgynix@gmail.com");
+        alert(`Submission rejected by endpoint: ${result.message || "Unknown error"}`);
       }
     } catch (err) {
-      alert("Pipeline offline. Please verify network or contact us directly.");
+      alert("Network pipeline offline. Check connection or email directly at gisgynix@gmail.com");
     } finally {
       setIsSubmitting(false);
     }
@@ -85,7 +86,8 @@ function ContactFormContent() {
 
   return (
     <section className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch mb-20">
-      {/* Left Form Card */}
+      
+      {/* Left Form Card Column */}
       <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/30 dark:bg-brand-surface/30 shadow-2xl relative flex flex-col justify-between">
         <AnimatePresence mode="wait">
           {!submitted ? (
@@ -181,7 +183,7 @@ function ContactFormContent() {
                 disabled={isSubmitting}
                 className="w-full py-4 rounded-xl bg-gradient-spatial text-brand-dark font-sans font-bold text-sm tracking-wide flex items-center justify-center space-x-2 shadow-lg shadow-brand-cyan/10 hover:shadow-brand-cyan/20 transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50"
               >
-                <span>{isSubmitting ? "Transmitting..." : "Submit Request to Get Service"}</span>
+                <span>{isSubmitting ? "Transmitting Requirements..." : "Submit Request to Get Service"}</span>
                 <Send size={15} />
               </button>
             </motion.form>
@@ -262,7 +264,7 @@ function ContactFormContent() {
         </div>
 
         <div className="pt-4 border-t border-slate-200 dark:border-slate-800 mt-6 flex items-center justify-between text-[11px] font-mono text-slate-400">
-          <span>ROUTING VIA WEB3FORMS</span>
+          <span>ROUTING VIA WEB3FORMS (FORM DATA)</span>
           <span className="text-brand-emerald font-bold">● LIVE INBOX CONDUIT</span>
         </div>
       </div>
@@ -286,7 +288,6 @@ export default function ContactPage() {
         </h1>
       </section>
 
-      {/* Suspense boundary keeps Next.js static rendering happy when accessing parameters */}
       <Suspense fallback={<div className="text-center font-mono text-xs text-slate-500">Loading Pipeline Matrix...</div>}>
         <ContactFormContent />
       </Suspense>
