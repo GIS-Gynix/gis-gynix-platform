@@ -83,7 +83,13 @@ export default function DataPortalPage() {
       colors: ["#00F5D4", "#01B4E4", "#3A86FF"]
     });
     
-    // Directs the browser window to call the API route streaming parameter
+    // CRITICAL FIX: Direct the browser to your storage bucket URL instantly if it exists to avoid timeouts
+    if (layer.download_url && layer.download_url !== "#" && layer.download_url !== "") {
+      window.open(layer.download_url, "_blank");
+      return;
+    }
+
+    // Directs the browser window to call the API route streaming parameter fallback
     window.location.href = `/api/layers?download=${layer.table_name}`;
   };
 
