@@ -4,8 +4,6 @@ import { createClient } from '@supabase/supabase-js';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  // DEFENSIVE GUARD: If Vercel is compiling this page statically during 'npm run build', 
-  // bypass the database execution entirely so it cannot crash.
   if (process.env.NEXT_PHASE === 'phase-production-build') {
     return NextResponse.json({ success: true, layers: [] }, { status: 200 });
   }
@@ -13,27 +11,28 @@ export async function GET(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  // Safeguard against missing environment variables during the build phase
   if (!supabaseUrl || !supabaseServiceKey) {
     return NextResponse.json({ success: true, layers: [] }, { status: 200 });
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
   const { searchParams } = new URL(request.url);
-  const downloadTable = searchParams.get('download');
+  
+  // Cleanly decode any empty spaces (%20) coming from the browser window URL string
+  const downloadTable = searchParams.get('download') ? decodeURIComponent(searchParams.get('download')!) : null;
 
   if (downloadTable) {
     try {
-      // Change this line:
-const { data, error } = await supabase
-  .rpc('export_table_to_geojson', { target_table: downloadTable }); // Removed .toLowerCase()
+      const { data, error } = await supabase
+        .rpc('export_table_to_geojson', { target_table: downloadTable }); // Passing the un-lowercased name
+
       if (error) throw error;
 
       return new NextResponse(JSON.stringify(data), {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
-          'Content-Disposition': `attachment; filename="${downloadTable}_network.geojson"`,
+          'Content-Disposition': `attachment; filename="${downloadTable.replace(/\s+/g, '_')}_network.geojson"`,
         },
       });
     } catch (err: any) {
