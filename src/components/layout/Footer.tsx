@@ -15,7 +15,7 @@ export default function Footer() {
     resources: [
       { name: "Pakistan GIS Data Portal", href: "/data-portal" },
       { name: "Geospatial Articles", href: "/blog" },
-      { name: "Developer Tools", href: "/resources" },
+      { name: "Developer Tools", href: "#" }, // Safely pointed to '#' until built
     ],
     company: [
       { name: "About Corporate Ecosystem", href: "/about" },
@@ -27,6 +27,7 @@ export default function Footer() {
   return (
     <footer className="w-full bg-slate-950 text-slate-400 border-t border-slate-900 font-sans pt-16 pb-8 z-10 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 border-b border-slate-900 pb-12">
+        
         {/* Company Overview Block */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center space-x-3">
@@ -76,9 +77,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-slate-600">
         <p>&copy; {new Date().getFullYear()} GIS Gynix. All rights engineered internationally.</p>
         <div className="flex space-x-6 mt-4 sm:mt-0">
-          {/* Added prefetch={false} here to block the 404 routing crash loops */}
-          <Link href="/privacy" prefetch={false} className="hover:text-slate-400">Security Architecture</Link>
-          <Link href="/terms" prefetch={false} className="hover:text-slate-400">Terms of Deployment</Link>
+          {/* Changed destinations to '#' and set prefetch false to secure routing integrity */}
+          <Link href="#" prefetch={false} className="hover:text-slate-400">Security Architecture</Link>
+          <Link href="#" prefetch={false} className="hover:text-slate-400">Terms of Deployment</Link>
         </div>
       </div>
     </footer>
