@@ -1,14 +1,24 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// This must be right at the top to kill the pre-rendering phase error
 export const dynamic = 'force-dynamic';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
 export async function GET(request: NextRequest) {
+  // DEFENSIVE GUARD: If Vercel is compiling this page statically during 'npm run build', 
+  // bypass the database execution entirely so it cannot crash.
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return NextResponse.json({ success: true, layers: [] }, { status: 200 });
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  // Safeguard against missing environment variables during the build phase
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return NextResponse.json({ success: true, layers: [] }, { status: 200 });
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
   const { searchParams } = new URL(request.url);
   const downloadTable = searchParams.get('download');
 
