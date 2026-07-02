@@ -24,9 +24,9 @@ export async function GET(request: NextRequest) {
 
   if (downloadTable) {
     try {
-      const { data, error } = await supabase
-        .rpc('export_table_to_geojson', { target_table: downloadTable.toLowerCase() });
-
+      // Change this line:
+const { data, error } = await supabase
+  .rpc('export_table_to_geojson', { target_table: downloadTable }); // Removed .toLowerCase()
       if (error) throw error;
 
       return new NextResponse(JSON.stringify(data), {
