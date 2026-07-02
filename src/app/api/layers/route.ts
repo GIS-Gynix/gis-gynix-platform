@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Forces Next.js to treat this as a live server endpoint rather than a static asset
+// This must be right at the top to kill the pre-rendering phase error
 export const dynamic = 'force-dynamic';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const downloadTable = searchParams.get('download');
 
-  // Scenario 1: Dynamic GeoJSON Database Stream
   if (downloadTable) {
     try {
       const { data, error } = await supabase
@@ -20,9 +19,7 @@ export async function GET(request: NextRequest) {
 
       if (error) throw error;
 
-      const geojsonPayload = JSON.stringify(data);
-
-      return new NextResponse(geojsonPayload, {
+      return new NextResponse(JSON.stringify(data), {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
@@ -34,7 +31,6 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Scenario 2: Active Layer Catalog Response
   try {
     const { data, error } = await supabase
       .from('spatial_layers_registry')
