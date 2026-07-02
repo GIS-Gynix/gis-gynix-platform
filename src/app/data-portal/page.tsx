@@ -1,87 +1,104 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { 
   Database, Search, Download, Filter, 
-  Layers, Map, Info, Calendar, HardDrive, Binary 
+  Layers, Map, Info, Calendar, HardDrive, Binary, ShieldAlert 
 } from "lucide-react";
 
+interface SpatialLayer {
+  id: number;
+  table_name: string;
+  display_name: string;
+  description: string;
+  file_size_label: string;
+  is_downloadable: boolean;
+  download_url: string;
+}
+
 export default function DataPortalPage() {
+  const [dataInventory, setDataInventory] = useState<SpatialLayer[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const dataInventory = [
-    {
-      id: "pak-adm1-boundaries",
-      category: "administrative",
-      title: "Provincial Administrative Boundaries",
-      description: "Complete vector dataset containing high-fidelity polygons for Balochistan, Punjab, Sindh, Khyber Pakhtunkhwa, Gilgit-Baltistan, and Azad Kashmir.",
-      format: "Shapefile / GeoJSON",
-      size: "4.2 MB",
-      projection: "WGS 84 / EPSG:4326",
-      updated: "2026-04",
-      license: "ODbL (Open Data)"
-    },
-    {
-      id: "pak-road-network",
-      category: "infrastructure",
-      title: "National Highway & Motorway Vector Model",
-      description: "Clean line topology networks of major transport arteries across Pakistan, optimized for network analysis and routing engine integration.",
-      format: "GeoJSON / KML",
-      size: "18.7 MB",
-      projection: "WGS 84 / UTM Zone 42N",
-      updated: "2026-05",
-      license: "ODbL (Open Data)"
-    },
-    {
-      id: "pak-srtm-dem",
-      category: "raster",
-      title: "SRTM 30m Digital Elevation Model (DEM)",
-      description: "Hydrologically corrected continuous elevation raster matrix sheets tile sets covering the northern mountainous terrain and Indus plains.",
-      format: "GeoTIFF (Raster)",
-      size: "142.0 MB",
-      projection: "WGS 84 / EPSG:4326",
-      updated: "2026-01",
-      license: "Public Domain"
-    },
-    {
-      id: "pak-major-rivers",
-      category: "hydrology",
-      title: "Indus River Basin Hydrology Network",
-      description: "Stream hierarchies, major river paths, water bodies, and delta boundary line features optimized for flood catchment layout simulations.",
-      format: "Shapefile",
-      size: "8.1 MB",
-      projection: "WGS 84 / EPSG:4326",
-      updated: "2026-03",
-      license: "ODbL (Open Data)"
-    }
-  ];
+  // Fetch active datasets dynamically from our Supabase PostGIS connection registry
+  useEffect(() => {
+    fetch("/api/layers")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setDataInventory(data.layers);
+        } else {
+          setError(data.error || "Failed to parse active layer registries from database.");
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message || "Network database gateway timeout.");
+        setLoading(false);
+      });
+  }, []);
 
   const categories = [
     { label: "All Datasets", value: "all" },
-    { label: "Administrative", value: "administrative" },
-    { label: "Infrastructure", value: "infrastructure" },
-    { label: "Hydrology Core", value: "hydrology" },
-    { label: "Elevation Raster", value: "raster" }
+    { label: "Administrative Boundaries", value: "administrative" },
+    { label: "Infrastructure / Transport", value: "infrastructure" },
+    { label: "Hydrology Core", value: "hydrology" }
   ];
 
-  // Execute download burst feedback loop
-  const triggerDownloadSimulation = (datasetTitle: string) => {
+  // Helper function to auto-route database entries to your dashboard navigation filter tabs
+  const resolveCategory = (tableName: string): string => {
+    if (!tableName) return "all";
+    const name = tableName.toLowerCase();
+    
+    if (name.includes("boundary") || name.includes("council") || name.includes("district") || name.includes("tehsil") || name.includes("national") || name.includes("provincial")) {
+      return "administrative";
+    }
+    if (name.includes("road") || name.includes("highway") || name.includes("transport")) {
+      return "infrastructure";
+    }
+    if (name.includes("water") || name.includes("river") || name.includes("hydrology") || name.includes("stream") || name.includes("canal")) {
+      return "hydrology";
+    }
+    return "all";
+  };
+
+  // Run live database feature query and stream the response file
+  const triggerDownload = (layer: SpatialLayer) => {
     confetti({
       particleCount: 80,
       spread: 60,
       origin: { y: 0.8 },
       colors: ["#00F5D4", "#01B4E4", "#3A86FF"]
     });
-    alert(`Initializing secure asset package stream download for: ${datasetTitle}`);
+    
+    // Directs the browser window to call the API route streaming parameter
+    // Example routes to: /api/layers?download=Pakistan_Roads
+    window.location.href = `/api/layers?download=${layer.table_name}`;
+  };
+    
+    // Builds out a safe framework anchor string to fetch the assets natively inside Next structure
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.href = layer.download_url.replace("https://gis-gynix-platform.vercel.app", "");
+    downloadAnchor.setAttribute("download", "");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    document.body.removeChild(downloadAnchor);
   };
 
   const filteredData = dataInventory.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          item.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
+    const targetQuery = searchQuery.toLowerCase();
+    const matchesSearch = (item.display_name?.toLowerCase() || "").includes(targetQuery) || 
+                          (item.description?.toLowerCase() || "").includes(targetQuery) ||
+                          (item.table_name?.toLowerCase() || "").includes(targetQuery);
+    
+    const calculatedCategory = resolveCategory(item.table_name);
+    const matchesCategory = selectedCategory === "all" || calculatedCategory === selectedCategory;
+    
     return matchesSearch && matchesCategory;
   });
 
@@ -105,7 +122,7 @@ export default function DataPortalPage() {
           <span className="bg-clip-text text-transparent bg-gradient-spatial">Analysis-Ready Repositories</span>
         </h1>
         <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
-          Download curated vector boundaries, infrastructure networks, and elevation rasters. All files include projection configurations and structural attribute schemas.
+          Download curated vector boundaries, infrastructure networks, and hydrology features. All files include projection configurations and structural attribute schemas.
         </p>
       </section>
 
@@ -143,8 +160,25 @@ export default function DataPortalPage() {
 
       {/* Main Metadata Catalog Stack */}
       <section className="max-w-5xl mx-auto space-y-6 mb-20">
+        
+        {/* Connection Loading State */}
+        {loading && (
+          <div className="text-center py-20 text-slate-400 font-medium font-sans animate-pulse flex justify-center items-center space-x-3">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-brand-emerald"></div>
+            <span>Synchronizing Live PostGIS Registries...</span>
+          </div>
+        )}
+
+        {/* Connection Error State */}
+        {error && (
+          <div className="bg-red-900/20 border border-red-800/40 text-red-400 p-6 rounded-2xl text-center max-w-2xl mx-auto font-sans">
+            <p className="font-bold">Database Stream Failover</p>
+            <p className="text-xs mt-1 opacity-80">{error}</p>
+          </div>
+        )}
+
         <AnimatePresence mode="popLayout">
-          {filteredData.map((item, idx) => (
+          {!loading && !error && filteredData.map((item) => (
             <motion.div
               layout
               initial={{ opacity: 0, x: -10 }}
@@ -161,7 +195,7 @@ export default function DataPortalPage() {
                     <Layers size={16} />
                   </div>
                   <h3 className="text-lg sm:text-xl font-sans font-bold text-slate-900 dark:text-white group-hover:text-brand-emerald transition-colors">
-                    {item.title}
+                    {item.display_name}
                   </h3>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -172,35 +206,42 @@ export default function DataPortalPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400">
                   <div className="flex items-center space-x-1.5">
                     <Binary size={12} className="text-brand-accent" />
-                    <span>{item.format}</span>
+                    <span>Shapefile Bundle</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <HardDrive size={12} className="text-brand-accent" />
-                    <span>{item.size}</span>
+                    <span>{item.file_size_label}</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <Map size={12} className="text-brand-accent" />
-                    <span>{item.projection}</span>
+                    <span>WGS 84 / EPSG:4326</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <Calendar size={12} className="text-brand-accent" />
-                    <span>{item.updated}</span>
+                    <span>Live Sync</span>
                   </div>
                 </div>
               </div>
 
               {/* Right Action Download System */}
-              <button
-                onClick={() => triggerDownloadSimulation(item.title)}
-                className="w-full md:w-auto px-6 py-4 rounded-xl bg-slate-900 dark:bg-brand-muted border border-slate-800 text-white dark:text-slate-200 font-sans font-bold text-sm tracking-wide flex items-center justify-center space-x-2 hover:bg-brand-cyan hover:text-brand-dark dark:hover:bg-gradient-spatial dark:hover:text-brand-dark transition-all duration-200 shadow-md shrink-0 group/btn"
-              >
-                <Download size={16} className="transform group-hover/btn:translate-y-0.5 transition-transform" />
-                <span>Download Asset Package</span>
-              </button>
+              {item.is_downloadable ? (
+                <button
+                  onClick={() => triggerDownload(item)}
+                  className="w-full md:w-auto px-6 py-4 rounded-xl bg-slate-900 dark:bg-brand-muted border border-slate-800 text-white dark:text-slate-200 font-sans font-bold text-sm tracking-wide flex items-center justify-center space-x-2 hover:bg-brand-cyan hover:text-brand-dark dark:hover:bg-gradient-spatial dark:hover:text-brand-dark transition-all duration-200 shadow-md shrink-0 group/btn"
+                >
+                  <Download size={16} className="transform group-hover/btn:translate-y-0.5 transition-transform" />
+                  <span>Download Asset Package</span>
+                </button>
+              ) : (
+                <div className="w-full md:w-auto px-6 py-4 rounded-xl bg-slate-950/40 border border-dashed border-slate-800 text-slate-500 font-sans font-medium text-sm flex items-center justify-center space-x-2 shrink-0">
+                  <ShieldAlert size={16} className="text-amber-500/60" />
+                  <span>Protected Dataset</span>
+                </div>
+              )}
             </motion.div>
           ))}
 
-          {filteredData.length === 0 && (
+          {!loading && !error && filteredData.length === 0 && (
             <div className="text-center py-12 font-sans text-slate-500 text-sm">
               No matching geospatial registries indexed. Broaden your search criteria parameters.
             </div>

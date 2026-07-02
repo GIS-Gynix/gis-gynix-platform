@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Globe, Layers, ArrowRight, Database, ShieldCheck, Cpu } from "lucide-react";
+import { Globe, Layers, ArrowRight, Database, Cpu } from "lucide-react";
 import SpatialHeroCanvas from "@/components/home/SpatialHeroCanvas";
 
 export default function HomePage() {
