@@ -76,8 +76,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-slate-600">
         <p>&copy; {new Date().getFullYear()} GIS Gynix. All rights engineered internationally.</p>
         <div className="flex space-x-6 mt-4 sm:mt-0">
-          <Link href="/privacy" className="hover:text-slate-400">Security Architecture</Link>
-          <Link href="/terms" className="hover:text-slate-400">Terms of Deployment</Link>
+          {/* Added prefetch={false} here to block the 404 routing crash loops */}
+          <Link href="/privacy" prefetch={false} className="hover:text-slate-400">Security Architecture</Link>
+          <Link href="/terms" prefetch={false} className="hover:text-slate-400">Terms of Deployment</Link>
         </div>
       </div>
     </footer>
