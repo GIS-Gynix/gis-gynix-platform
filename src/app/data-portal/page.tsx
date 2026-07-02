@@ -27,7 +27,14 @@ export default function DataPortalPage() {
 
   // Fetch active datasets dynamically from our Supabase PostGIS connection registry
   useEffect(() => {
-    fetch("/api/layers")
+    // Adding custom fetch headers to aggressively kill edge/browser caching loops
+    fetch("/api/layers", { 
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache"
+      }
+    })
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
