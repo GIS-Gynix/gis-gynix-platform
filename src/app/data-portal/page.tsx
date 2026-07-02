@@ -77,17 +77,7 @@ export default function DataPortalPage() {
     });
     
     // Directs the browser window to call the API route streaming parameter
-    // Example routes to: /api/layers?download=Pakistan_Roads
     window.location.href = `/api/layers?download=${layer.table_name}`;
-  };
-    
-    // Builds out a safe framework anchor string to fetch the assets natively inside Next structure
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.href = layer.download_url.replace("https://gis-gynix-platform.vercel.app", "");
-    downloadAnchor.setAttribute("download", "");
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    document.body.removeChild(downloadAnchor);
   };
 
   const filteredData = dataInventory.filter(item => {
@@ -206,7 +196,7 @@ export default function DataPortalPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400">
                   <div className="flex items-center space-x-1.5">
                     <Binary size={12} className="text-brand-accent" />
-                    <span>Shapefile Bundle</span>
+                    <span>GeoJSON Stream</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <HardDrive size={12} className="text-brand-accent" />
@@ -218,7 +208,7 @@ export default function DataPortalPage() {
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <Calendar size={12} className="text-brand-accent" />
-                    <span>Live Sync</span>
+                    <span>Live DB Sync</span>
                   </div>
                 </div>
               </div>
