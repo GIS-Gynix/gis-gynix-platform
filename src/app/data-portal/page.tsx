@@ -27,7 +27,6 @@ export default function DataPortalPage() {
 
   // Fetch active datasets dynamically from our Supabase PostGIS connection registry
   useEffect(() => {
-    // Adding custom fetch headers to aggressively kill edge/browser caching loops
     fetch("/api/layers", { 
       cache: "no-store",
       headers: {
@@ -83,13 +82,11 @@ export default function DataPortalPage() {
       colors: ["#00F5D4", "#01B4E4", "#3A86FF"]
     });
     
-    // CRITICAL FIX: Direct the browser to your storage bucket URL instantly if it exists to avoid timeouts
     if (layer.download_url && layer.download_url !== "#" && layer.download_url !== "") {
       window.open(layer.download_url, "_blank");
       return;
     }
 
-    // Directs the browser window to call the API route streaming parameter fallback
     window.location.href = `/api/layers?download=${layer.table_name}`;
   };
 
@@ -238,7 +235,6 @@ export default function DataPortalPage() {
               ) : (
                 <button
                   onClick={() => {
-                    // Redirects to contact form and automatically feeds the dataset name into the message context parameter
                     window.location.href = `/contact?dataset=${encodeURIComponent(item.display_name)}`;
                   }}
                   className="w-full md:w-auto px-6 py-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500 hover:bg-amber-500 hover:text-slate-950 font-sans font-bold text-sm tracking-wide flex items-center justify-center space-x-2 transition-all duration-200 shadow-md shrink-0"
@@ -247,6 +243,8 @@ export default function DataPortalPage() {
                   <span>Get Data (Premium Access)</span>
                 </button>
               )}
+            </motion.div>
+          ))}
 
           {!loading && !error && filteredData.length === 0 && (
             <div className="text-center py-12 font-sans text-slate-500 text-sm">
