@@ -1,55 +1,69 @@
-import { NextResponse, NextRequest } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
-export const dynamic = 'force-dynamic';
+// Initialize your Supabase Service/Postgres client connection
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY; // or your standard service key
+const supabase = createClient(supabaseUrl!, supabaseKey!);
 
-export async function GET(request: NextRequest) {
-  if (process.env.NEXT_PHASE === 'phase-production-build') {
-    return NextResponse.json({ success: true, layers: [] }, { status: 200 });
-  }
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return NextResponse.json({ success: true, layers: [] }, { status: 200 });
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  
-  // Cleanly decode any empty spaces (%20) coming from the browser window URL string
-  const downloadTable = searchParams.get('download') ? decodeURIComponent(searchParams.get('download')!) : null;
-
-  if (downloadTable) {
-    try {
-      const { data, error } = await supabase
-        .rpc('export_table_to_geojson', { target_table: downloadTable }); // Passing the un-lowercased name
-
-      if (error) throw error;
-
-      return new NextResponse(JSON.stringify(data), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Disposition': `attachment; filename="${downloadTable.replace(/\s+/g, '_')}_network.geojson"`,
-        },
-      });
-    } catch (err: any) {
-      return NextResponse.json({ success: false, error: `Export failed: ${err.message}` }, { status: 500 });
-    }
-  }
+  const downloadTable = searchParams.get("download");
 
   try {
-    const { data, error } = await supabase
-      .from('spatial_layers_registry')
-      .select('*')
-      .order('id', { ascending: true });
+    // 1. DYNAMIC DOWNLOAD ROUTE
+    if (downloadTable) {
+      // Query the specific table requested directly from PostgreSQL
+      const { data, error } = await supabase.rpc("get_table_data", { t_name: downloadTable });
+      
+      if (error) throw error;
 
-    if (error) throw error;
+      // Transform rows into a clean GeoJSON FeatureCollection format
+      const geojson = {
+        type: "FeatureCollection",
+        features: data.map((row: any) => ({
+          type: "Feature",
+          geometry: typeof row.geom === "string" ? JSON.parse(row.geom) : row.geom,
+          properties: { ...row, geom: undefined } // clear spatial data column from properties block
+        }))
+      };
 
-    return NextResponse.json({ success: true, layers: data }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return new NextResponse(JSON.stringify(geojson), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Disposition": `attachment; filename="${downloadTable.toLowerCase().replace(/\s+/g, "_")}.geojson"`
+        }
+      });
+    }
+
+    // 2. AUTO-DETECT CATALOG INDEX ROUTE
+    // Queries the PostGIS system directory database directly for all active tables
+    const { data: tables, error: tableError } = await supabase.rpc("list_spatial_tables");
+
+    if (tableError) throw tableError;
+
+    // Map system tables dynamically into the exact frontend structure your UI expects
+    const dynamicLayers = tables.map((t: any, index: number) => {
+      // Formats table name for presentation (e.g., 'pakistan_waterways_data' -> 'Pakistan Waterways Data')
+      const formattedName = t.table_name
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char: string) => char.toUpperCase());
+
+      return {
+        id: index + 1,
+        table_name: t.table_name,
+        display_name: formattedName,
+        description: `Automated live vector network index mapping system feature class: ${formattedName}. Features include attributes and projection mapping schema natively parsed from your cloud database topology.`,
+        file_size_label: `${(t.estimated_bytes / (1024 * 1024)).toFixed(1)} MB`,
+        is_downloadable: true,
+        download_url: "#" // Triggers your frontend code fallback to stream via API route handler
+      };
+    });
+
+    return NextResponse.json({ success: true, layers: dynamicLayers });
+
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
