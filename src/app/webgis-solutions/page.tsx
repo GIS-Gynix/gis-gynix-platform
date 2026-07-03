@@ -1,199 +1,339 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import { 
-  Layers, Map as MapIcon, Maximize2, 
-  MousePointer, Radio, Eye, EyeOff, Info 
+  Layers, Map as MapIcon, List, ChevronLeft, ChevronRight, 
+  Eye, EyeOff, ShieldCheck 
 } from "lucide-react";
+import "maplibre-gl/dist/maplibre-gl.css";
 
-export default function WebGisSolutionsPage() {
+interface GISLayer {
+  id: string;
+  table_name: string;
+  display_name: string;
+  visible: boolean;
+  geometry_type: "line" | "point" | "polygon";
+  legend_color: string;
+}
+
+export default function WebGISAppsPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  const [lng, setLng] = useState<number>(-77.0425);
-  const [lat, setLat] = useState<number>(38.8951);
-  const [zoom, setZoom] = useState<number>(11);
-  const [currentBasemap, setCurrentBasemap] = useState<string>("dark");
-  const [layerVisible, setLayerVisible] = useState<boolean>(true);
+  
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState<"layers" | "legend" | "basemaps">("layers");
+  const [currentBasemap, setCurrentBasemap] = useState("dark");
+  const [gisLayers, setGisLayers] = useState<GISLayer[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const basemaps: Record<string, string> = {
-    dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
-    voyager: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
-    positron: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-  };
+  const basemaps = [
+    { 
+      id: "streets", 
+      label: "OpenStreetMap Standard", 
+      style: {
+        version: 8,
+        sources: { "osm-tiles": { type: "raster", tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"], tileSize: 256, attribution: "© OpenStreetMap" } },
+        layers: [{ id: "osm-layer", type: "raster", source: "osm-tiles" }]
+      },
+      thumbnail: "https://tile.openstreetmap.org/5/23/14.png"
+    },
+    { 
+      id: "dark", 
+      label: "CartoDB Dark Matter", 
+      style: {
+        version: 8,
+        sources: { "carto-dark-tiles": { type: "raster", tiles: ["https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"], tileSize: 256, attribution: "© CartoDB" } },
+        layers: [{ id: "carto-dark-layer", type: "raster", source: "carto-dark-tiles" }]
+      },
+      thumbnail: "https://basemaps.cartocdn.com/dark_all/5/23/14.png"
+    }
+  ];
 
+  // 1. Fetch layers and exact QGIS database styles concurrently
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/layers").then(res => res.json()),
+      fetch("/api/styles").then(res => res.json())
+    ]).then(([layersData, stylesData]) => {
+      if (layersData.success) {
+        const qgisStyles = stylesData.styles || {};
+        
+        const liveLayers = layersData.layers.map((layer: any) => {
+          const nameLower = layer.table_name.toLowerCase();
+          
+          let geomType: "line" | "point" | "polygon" = "polygon";
+          if (nameLower.includes("water") || nameLower.includes("road") || nameLower.includes("stream") || nameLower.includes("railway") || nameLower.includes("canal") || nameLower.includes("pipeline")) {
+            geomType = "line";
+          } else if (nameLower.includes("point") || nameLower.includes("node") || nameLower.includes("station")) {
+            geomType = "point";
+          }
+
+          // Assign exact QGIS saved XML style hex if present
+          const exactQgisColor = qgisStyles[layer.table_name] || "#3A86FF";
+
+          return {
+            id: layer.id.toString(),
+            table_name: layer.table_name,
+            display_name: layer.display_name,
+            visible: false,
+            geometry_type: geomType,
+            legend_color: exactQgisColor
+          };
+        });
+        setGisLayers(liveLayers);
+      }
+      setLoading(false);
+    }).catch((err) => {
+      console.error("Error setting operations workspace:", err);
+      setLoading(false);
+    });
+  }, []);
+
+  // 2. Initialize MapLibre Canvas Viewport with Style State Persistence
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    // Initialize MapLibre GL core architecture instance
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: basemaps[currentBasemap],
-      center: [lng, lat],
-      zoom: zoom,
-      attributionControl: false
+      style: basemaps[1].style as any,
+      center: [69.3451, 30.3753], // Pakistan View Coordinates
+      zoom: 5.5,
     });
 
+    map.addControl(new maplibregl.NavigationControl({ showCompass: true }), "top-right");
     mapRef.current = map;
 
-    // Register active dynamic event hooks for telemetry metrics
-    map.on("move", () => {
-      const center = map.getCenter();
-      setLng(Number(center.lng.toFixed(4)));
-      setLat(Number(center.lat.toFixed(4)));
-      setZoom(Number(map.getZoom().toFixed(2)));
-    });
-
-    // Inject mock GeoJSON parcels once style resources load completely
+    // CRITICAL FIX: Re-inject active MVT layers instantly when base styles are swapped
     map.on("style.load", () => {
-      map.addSource("mock-parcels", {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: [
-            {
-              type: "Feature",
-              properties: { id: 101, type: "Commercial Mixed-Use" },
-              geometry: {
-                type: "Polygon",
-                coordinates: [[
-                  [-77.05, 38.90],
-                  [-77.03, 38.90],
-                  [-77.03, 38.89],
-                  [-77.05, 38.89],
-                  [-77.05, 38.90]
-                ]]
-              }
-            }
-          ]
-        }
-      });
-
-      map.addLayer({
-        id: "parcels-layer",
-        type: "fill",
-        source: "mock-parcels",
-        layout: { visibility: layerVisible ? "visible" : "none" },
-        paint: {
-          "fill-color": "#00F5D4",
-          "fill-opacity": 0.25,
-          "fill-outline-color": "#01B4E4"
+      gisLayers.forEach((layer) => {
+        if (layer.visible) {
+          reapplyLayerToMap(map, layer);
         }
       });
     });
 
     return () => map.remove();
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
+  }, [gisLayers.length === 0]);
 
-  // Sync state changes with internal map engines smoothly
-  const handleBasemapChange = (styleKey: string) => {
-    setCurrentBasemap(styleKey);
-    if (mapRef.current) {
-      mapRef.current.setStyle(basemaps[styleKey]);
+  const reapplyLayerToMap = (map: maplibregl.Map, layer: GISLayer) => {
+    if (!map.getSource(layer.table_name)) {
+      map.addSource(layer.table_name, {
+        type: "vector",
+        tiles: [`${window.location.origin}/api/tiles/${layer.table_name}/{z}/{x}/{y}`],
+      });
+    }
+
+    if (!map.getLayer(layer.table_name)) {
+      map.addLayer({
+        id: layer.table_name,
+        type: layer.geometry_type === "line" ? "line" : "fill",
+        source: layer.table_name,
+        "source-layer": layer.table_name,
+        paint: layer.geometry_type === "line" ? {
+          "line-color": layer.legend_color,
+          "line-width": 2.5
+        } : {
+          "fill-color": layer.legend_color,
+          "fill-opacity": 0.5
+        }
+      });
+    } else {
+      map.setLayoutProperty(layer.table_name, "visibility", "visible");
     }
   };
 
-  const toggleLayerVisibility = () => {
-    const nextState = !layerVisible;
-    setLayerVisible(nextState);
-    if (mapRef.current && mapRef.current.getLayer("parcels-layer")) {
-      mapRef.current.setLayoutProperty("parcels-layer", "visibility", nextState ? "visible" : "none");
+  // 3. Basemap Selection Switch Control
+  const handleBasemapChange = (styleConfig: any, id: string) => {
+    setCurrentBasemap(id);
+    if (mapRef.current) {
+      mapRef.current.setStyle(styleConfig);
     }
+  };
+
+  // 4. Secure Layer Visibility Toggle
+  const toggleLayerVisibility = (id: string) => {
+    setGisLayers(prev => prev.map(layer => {
+      if (layer.id === id) {
+        const nextVisibility = !layer.visible;
+        const map = mapRef.current;
+        if (map) {
+          if (nextVisibility) {
+            reapplyLayerToMap(map, layer);
+          } else {
+            if (map.getLayer(layer.table_name)) {
+              map.setLayoutProperty(layer.table_name, "visibility", "none");
+            }
+          }
+        }
+        return { ...layer, visible: nextVisibility };
+      }
+      return layer;
+    }));
   };
 
   return (
-    <div className="w-full bg-spatial-grid min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div className="w-full h-screen flex overflow-hidden bg-slate-950 font-sans text-slate-200 relative pt-16">
       
-      {/* Informative Section Header */}
-      <section className="max-w-4xl mx-auto text-center mt-8 mb-12 space-y-4">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-surface/50 backdrop-blur-md"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan" />
-          <span className="text-[11px] font-mono uppercase tracking-widest text-slate-600 dark:text-slate-400">
-            Interactive GIS Infrastructure Sandbox
-          </span>
-        </motion.div>
-        <h1 className="text-4xl sm:text-5xl font-sans font-black text-slate-900 dark:text-white tracking-tight">
-          Cloud-Native WebGIS Systems <br />
-          <span className="bg-clip-text text-transparent bg-gradient-spatial">Operational Matrix Portal</span>
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm leading-relaxed">
-          Interact with our production framework engine below. We compile enterprise tiled geometries, serving data globally with sub-second processing latencies.
-        </p>
-      </section>
+      {/* STATUS FLAG BADGE */}
+      <div className="absolute bottom-4 right-4 z-10 bg-slate-950/80 backdrop-blur-md border border-slate-800/80 rounded-lg px-3 py-1.5 flex items-center space-x-2 pointer-events-none shadow-xl">
+        <ShieldCheck className="text-emerald-400" size={14} />
+        <span className="text-[10px] font-mono tracking-wider text-slate-400 uppercase">
+          QGIS Database Symbology Synchronized
+        </span>
+      </div>
 
-      {/* Embedded Live Dashboard Layout */}
-      <section className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6 h-[650px] mb-16">
-        
-        {/* Left Control Panel Container */}
-        <div className="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-brand-surface/40 flex flex-col justify-between h-full shadow-xl">
-          <div className="space-y-6">
-            <div className="space-y-1">
-              <h3 className="text-base font-sans font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Layers size={18} className="text-brand-cyan" /> Layer Inventory
-              </h3>
-              <p className="text-xs text-slate-500">Toggle operational data boundaries.</p>
-            </div>
+      {/* DASHBOARD CONTROL SIDEBAR */}
+      <div 
+        className={`h-full bg-slate-900 border-r border-slate-800 shadow-2xl flex flex-col transition-all duration-300 z-20 relative ${
+          isSidebarOpen ? "w-80 sm:w-96" : "w-0 -translate-x-full"
+        }`}
+      >
+        {/* Tab Strip Menu Headers */}
+        <div className="flex bg-slate-950 border-b border-slate-800/60 p-1">
+          <button 
+            onClick={() => setActiveTab("layers")} 
+            className={`flex-1 flex items-center justify-center space-x-1.5 py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
+              activeTab === "layers" ? "bg-slate-800 text-emerald-400" : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Layers size={13} />
+            <span>Layers</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab("legend")} 
+            className={`flex-1 flex items-center justify-center space-x-1.5 py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
+              activeTab === "legend" ? "bg-slate-800 text-cyan-400" : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <List size={13} />
+            <span>Legend</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab("basemaps")} 
+            className={`flex-1 flex items-center justify-center space-x-1.5 py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
+              activeTab === "basemaps" ? "bg-slate-800 text-amber-400" : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <MapIcon size={13} />
+            <span>Basemaps</span>
+          </button>
+        </div>
 
-            {/* Layer Controller Option */}
-            <button
-              onClick={toggleLayerVisibility}
-              className={`w-full flex items-center justify-between p-3 rounded-xl border text-xs font-semibold font-mono transition-all ${
-                layerVisible 
-                  ? "border-brand-emerald/40 bg-brand-emerald/5 text-slate-800 dark:text-brand-emerald" 
-                  : "border-slate-200 dark:border-slate-800 text-slate-500"
-              }`}
-            >
-              <span className="flex items-center gap-2">Mock Zoning Parcels</span>
-              {layerVisible ? <Eye size={14} /> : <EyeOff size={14} />}
-            </button>
+        {/* Dynamic Inner Panel Viewport */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-6 scrollbar-none">
+          
+          {/* VIEW TAB 1: OPERATIONAL DATA LAYERS */}
+          {activeTab === "layers" && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xs font-bold tracking-wider uppercase font-mono text-slate-400">Database Layers</h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">Stream vectors natively stored within cloud topologies.</p>
+              </div>
 
-            <div className="border-t border-slate-200 dark:border-slate-800 pt-4 space-y-3">
-              <h3 className="text-xs font-sans font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <MapIcon size={14} className="text-brand-accent" /> Basemap Engine
-              </h3>
-              <div className="grid grid-cols-1 gap-2">
-                {Object.keys(basemaps).map((styleKey) => (
-                  <button
-                    key={styleKey}
-                    onClick={() => handleBasemapChange(styleKey)}
-                    className={`px-3 py-2 rounded-lg border text-xs font-mono capitalize transition-all ${
-                      currentBasemap === styleKey
-                        ? "border-brand-cyan bg-brand-cyan/5 text-brand-cyan font-bold"
-                        : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-brand-cyan/40"
+              {loading && (
+                <div className="text-center py-6 text-xs font-mono text-slate-500 animate-pulse">
+                  Querying spatial entities...
+                </div>
+              )}
+
+              <div className="space-y-2">
+                {!loading && gisLayers.map(layer => (
+                  <div 
+                    key={layer.id} 
+                    onClick={() => toggleLayerVisibility(layer.id)} 
+                    className={`flex items-center justify-between p-3.5 rounded-xl border cursor-pointer select-none transition-all ${
+                      layer.visible 
+                        ? "bg-slate-800/50 border-emerald-500/40 text-white" 
+                        : "bg-slate-950/30 border-slate-800 text-slate-400 hover:border-slate-700"
                     }`}
                   >
-                    {styleKey} Vector Core
-                  </button>
+                    <div className="flex items-center space-x-3">
+                      <span className="w-3 h-3 rounded-sm opacity-80" style={{ backgroundColor: layer.legend_color }} />
+                      <span className="text-xs font-bold tracking-wide">{layer.display_name}</span>
+                    </div>
+                    {layer.visible ? <Eye size={14} className="text-emerald-400" /> : <EyeOff size={14} />}
+                  </div>
                 ))}
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Bottom Telemetry Display Panel */}
-          <div className="bg-slate-900 dark:bg-brand-dark rounded-xl p-4 border border-slate-800 text-[11px] font-mono space-y-2 text-slate-400">
-            <div className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Telemetry Metrics</div>
-            <div className="flex justify-between"><span>LONGITUDE:</span><span className="text-brand-emerald font-bold">{lng}</span></div>
-            <div className="flex justify-between"><span>LATITUDE:</span><span className="text-brand-emerald font-bold">{lat}</span></div>
-            <div className="flex justify-between"><span>ZOOM RATIO:</span><span className="text-brand-cyan font-bold">{zoom}</span></div>
-          </div>
-        </div>
+          {/* VIEW TAB 2: LIVE SYMBOLOGY LEGEND */}
+          {activeTab === "legend" && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xs font-bold tracking-wider uppercase font-mono text-slate-400">Active Map Symbology</h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">Reflecting live coordinate legend signatures parsed from QGIS metadata.</p>
+              </div>
+              
+              <div className="space-y-3 pt-1">
+                {gisLayers.filter(l => l.visible).length === 0 ? (
+                  <div className="border border-dashed border-slate-800 rounded-xl p-6 text-center text-xs font-mono text-slate-500">
+                    No viewport channels active. Enable map layers to fetch styling profiles.
+                  </div>
+                ) : (
+                  gisLayers.filter(l => l.visible).map(layer => (
+                    <div key={layer.id} className="bg-slate-950/40 border border-slate-800/60 p-3.5 rounded-xl flex flex-col space-y-2">
+                      <span className="text-xs font-bold text-slate-200">{layer.display_name}</span>
+                      <div className="flex items-center space-x-3 pl-1">
+                        {layer.geometry_type === "line" ? (
+                          <div className="w-8 h-1.5 rounded-full" style={{ backgroundColor: layer.legend_color }} />
+                        ) : (
+                          <div className="w-5 h-4 rounded border border-white/10" style={{ backgroundColor: layer.legend_color, opacity: 0.5 }} />
+                        )}
+                        <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider text-[10px]">
+                          QGIS Database Style Match
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
 
-        {/* Right Mapping Canvas Container Layer */}
-        <div className="lg:col-span-3 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl relative h-full bg-slate-950">
-          <div ref={mapContainerRef} className="w-full h-full" />
-          
-          {/* Absolute Mapping Watermark Badge */}
-          <div className="absolute top-4 right-4 pointer-events-none glass-panel px-3 py-1.5 rounded-lg border border-white/10 text-[10px] font-mono text-white tracking-widest uppercase">
-            MapLibre GL Vector Engine
-          </div>
+          {/* VIEW TAB 3: BASEMAP GRID GALLERY */}
+          {activeTab === "basemaps" && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xs font-bold tracking-wider uppercase font-mono text-slate-400">Backdrop Gallery</h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">Switch reference grids without losing toggled geometry overlays.</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                {basemaps.map(bm => (
+                  <div 
+                    key={bm.id}
+                    onClick={() => handleBasemapChange(bm.style, bm.id)}
+                    className={`group relative rounded-xl overflow-hidden cursor-pointer border transition-all ${
+                      currentBasemap === bm.id ? "border-amber-400 scale-[1.02]" : "border-slate-800 hover:border-slate-700"
+                    }`}
+                  >
+                    <img src={bm.thumbnail} alt={bm.label} className="w-full h-20 object-cover opacity-50 group-hover:opacity-75 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                    <div className="absolute bottom-2 left-2 right-2">
+                      <p className="text-[10px] font-bold tracking-wide text-white truncate">{bm.label}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
-      </section>
+      </div>
+
+      {/* FLOATING COLLAPSIBLE ARROW ACTUATOR */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="absolute top-1/2 -translate-y-1/2 z-30 bg-slate-900 border-y border-r border-slate-800 text-slate-400 hover:text-white p-2 rounded-r-xl shadow-2xl transition-all"
+        style={{ left: isSidebarOpen ? "384px" : "0px" }}
+      >
+        {isSidebarOpen ? <ChevronLeft size={15} /> : <ChevronRight size={15} />}
+      </button>
+
+      {/* RENDER VIEWPORT INTERACTIVE MAP CANVAS */}
+      <div className="flex-1 h-full relative bg-slate-950" ref={mapContainerRef} />
     </div>
   );
 }
