@@ -125,19 +125,45 @@ export default function WebGISAppsPage() {
     }
 
     if (!map.getLayer(layer.table_name)) {
-      map.addLayer({
-        id: layer.table_name,
-        type: layer.geometry_type === "line" ? "line" : "fill",
-        source: layer.table_name,
-        "source-layer": layer.table_name,
-        paint: layer.geometry_type === "line" ? {
-          "line-color": layer.legend_color,
-          "line-width": 2.5
-        } : {
-          "fill-color": layer.legend_color,
-          "fill-opacity": 0.5
-        }
-      });
+      // TypeScript Safe Separation of Layer Rules
+      if (layer.geometry_type === "line") {
+        map.addLayer({
+          id: layer.table_name,
+          type: "line",
+          source: layer.table_name,
+          "source-layer": layer.table_name,
+          paint: {
+            "line-color": layer.legend_color,
+            "line-width": 2.5
+          }
+        });
+      } else if (layer.geometry_type === "point") {
+        map.addLayer({
+          id: layer.table_name,
+          type: "circle",
+          source: layer.table_name,
+          "source-layer": layer.table_name,
+          paint: {
+            "circle-color": layer.legend_color,
+            "circle-radius": 6,
+            "circle-stroke-color": "#ffffff",
+            "circle-stroke-width": 1
+          }
+        });
+      } else {
+        // Default to Polygon / Fill configuration
+        map.addLayer({
+          id: layer.table_name,
+          type: "fill",
+          source: layer.table_name,
+          "source-layer": layer.table_name,
+          paint: {
+            "fill-color": layer.legend_color,
+            "fill-opacity": 0.5,
+            "fill-outline-color": layer.legend_color
+          }
+        });
+      }
     } else {
       map.setLayoutProperty(layer.table_name, "visibility", "visible");
     }
