@@ -10,8 +10,14 @@ export async function GET(request: Request) {
   const downloadTable = searchParams.get("download");
 
   try {
-    // 1. DOWNLOAD ROUTE HANDLER
+    // 1. DYNAMIC DOWNLOAD ROUTE
     if (downloadTable) {
+      // SECURITY BLOCK: Prevent direct URL extraction attacks on premium tables
+      const lowerTable = downloadTable.toLowerCase();
+      if (lowerTable.includes("premium") || lowerTable.includes("paid")) {
+        return NextResponse.json({ success: false, error: "Access Denied. This registry requires a premium authorization clearance asset profile." }, { status: 403 });
+      }
+
       const { data, error } = await supabase.rpc("get_table_data", { t_name: downloadTable });
       if (error) throw error;
 
@@ -33,16 +39,20 @@ export async function GET(request: Request) {
       });
     }
 
-    // 2. DYNAMIC LAYERS DIRECTORY SCANNER
+    // 2. AUTO-DETECT CATALOG INDEX ROUTE
     const { data: tables, error: tableError } = await supabase.rpc("list_spatial_tables");
     if (tableError) throw tableError;
 
     const dynamicLayers = tables.map((t: any, index: number) => {
+      const tableNameLower = t.table_name.toLowerCase();
+      
+      // AUTOMATED LOCK DETECTION: True unless table name contains 'premium' or 'paid'
+      const isDownloadable = !(tableNameLower.includes("premium") || tableNameLower.includes("paid"));
+
       const formattedName = t.table_name
         .replace(/_/g, " ")
         .replace(/\b\w/g, (char: string) => char.toUpperCase());
 
-      // Use the pgAdmin comment if it exists, otherwise fall back to generic
       const finalDescription = t.table_description || 
         `Automated live vector dataset index for ${formattedName}. Features include structural attribute schema maps parsed straight from your database topology.`;
 
@@ -52,7 +62,7 @@ export async function GET(request: Request) {
         display_name: formattedName,
         description: finalDescription,
         file_size_label: `${(t.estimated_bytes / (1024 * 1024)).toFixed(1)} MB`,
-        is_downloadable: true,
+        is_downloadable: isDownloadable,
         download_url: "#"
       };
     });

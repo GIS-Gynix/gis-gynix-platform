@@ -236,13 +236,17 @@ export default function DataPortalPage() {
                   <span>Download Asset Package</span>
                 </button>
               ) : (
-                <div className="w-full md:w-auto px-6 py-4 rounded-xl bg-slate-950/40 border border-dashed border-slate-800 text-slate-500 font-sans font-medium text-sm flex items-center justify-center space-x-2 shrink-0">
-                  <ShieldAlert size={16} className="text-amber-500/60" />
-                  <span>Protected Dataset</span>
-                </div>
+                <button
+                  onClick={() => {
+                    // Redirects to contact form and automatically feeds the dataset name into the message context parameter
+                    window.location.href = `/contact?dataset=${encodeURIComponent(item.display_name)}`;
+                  }}
+                  className="w-full md:w-auto px-6 py-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500 hover:bg-amber-500 hover:text-slate-950 font-sans font-bold text-sm tracking-wide flex items-center justify-center space-x-2 transition-all duration-200 shadow-md shrink-0"
+                >
+                  <ShieldAlert size={16} />
+                  <span>Get Data (Premium Access)</span>
+                </button>
               )}
-            </motion.div>
-          ))}
 
           {!loading && !error && filteredData.length === 0 && (
             <div className="text-center py-12 font-sans text-slate-500 text-sm">
