@@ -7,7 +7,6 @@ const supabase = createClient(supabaseUrl!, supabaseKey!);
 
 export async function GET() {
   try {
-    // Querying your exact table name from the database snapshot
     const { data: layers, error } = await supabase
       .from("spatial_layers_registry")
       .select("table_name, sld_text");
@@ -32,7 +31,7 @@ export async function GET() {
       const strokeMatch = sld.match(/<se:SvgParameter name="stroke">([^<]+)<\/se:SvgParameter>/i) || 
                           sld.match(/<CssParameter name="stroke">([^<]+)<\/CssParameter>/i);
       const widthMatch = sld.match(/<se:SvgParameter name="stroke-width">([^<]+)<\/se:SvgParameter>/i) || 
-                         wl.match(/<CssParameter name="stroke-width">([^<]+)<\/CssParameter>/i);
+                         sld.match(/<CssParameter name="stroke-width">([^<]+)<\/CssParameter>/i); // Fixed typo here (wl -> sld)
       const opacityMatch = sld.match(/<se:SvgParameter name="fill-opacity">([^<]+)<\/se:SvgParameter>/i) || 
                            sld.match(/<CssParameter name="fill-opacity">([^<]+)<\/CssParameter>/i);
 
