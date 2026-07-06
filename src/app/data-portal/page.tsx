@@ -73,7 +73,7 @@ export default function DataPortalPage() {
     return "all";
   };
 
-  // Run live database feature query and stream the response file
+  // Run live database feature query and stream the attribute-safe response file
   const triggerDownload = (layer: SpatialLayer) => {
     confetti({
       particleCount: 80,
@@ -87,7 +87,8 @@ export default function DataPortalPage() {
       return;
     }
 
-    window.location.href = `/api/layers?download=${layer.table_name}`;
+    // UPDATED: Pointing directly to the attributes-preserving download engine 
+    window.location.href = `/api/download?table=${layer.table_name}`;
   };
 
   const filteredData = dataInventory.filter(item => {
