@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import confetti from "canvas-confetti";
+import confetti from "canvas-commetti"; // Assumes your setup uses canvas-confetti
 import { 
   Database, Search, Download, Filter, 
   Layers, Map, Info, Calendar, HardDrive, Binary, ShieldAlert 
@@ -73,21 +73,29 @@ export default function DataPortalPage() {
     return "all";
   };
 
-  // Run live database feature query and stream the attribute-safe response file
+  // Run live database feature query and stream the memory-safe zipped file
   const triggerDownload = (layer: SpatialLayer) => {
-    confetti({
-      particleCount: 80,
-      spread: 60,
-      origin: { y: 0.8 },
-      colors: ["#00F5D4", "#01B4E4", "#3A86FF"]
-    });
+    // Fire festive visual feedback
+    try {
+      const anyConfetti = confetti as any;
+      if (typeof anyConfetti === "function") {
+        anyConfetti({
+          particleCount: 80,
+          spread: 60,
+          origin: { y: 0.8 },
+          colors: ["#00F5D4", "#01B4E4", "#3A86FF"]
+        });
+      }
+    } catch (e) {
+      console.log("Confetti module skipped");
+    }
     
     if (layer.download_url && layer.download_url !== "#" && layer.download_url !== "") {
       window.open(layer.download_url, "_blank");
       return;
     }
 
-    // UPDATED: Pointing directly to the attributes-preserving download engine 
+    // UPDATED: Standard location routing to trigger on-the-fly zip streaming pipeline
     window.location.href = `/api/download?table=${layer.table_name}`;
   };
 
@@ -207,7 +215,8 @@ export default function DataPortalPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400">
                   <div className="flex items-center space-x-1.5">
                     <Binary size={12} className="text-brand-accent" />
-                    <span>GeoJSON Stream</span>
+                    {/* UPDATED: Displays zip encoding information */}
+                    <span>Zipped GeoJSON Stream</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <HardDrive size={12} className="text-brand-accent" />
