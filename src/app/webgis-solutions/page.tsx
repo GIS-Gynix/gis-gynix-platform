@@ -29,26 +29,66 @@ export default function WebGISAppsPage() {
   const [gisLayers, setGisLayers] = useState<GISLayer[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // 3 Primary Industry-Standard Basemaps (Corrected Tile Links)
   const basemaps = [
     { 
       id: "streets", 
       label: "OpenStreetMap Standard", 
       style: {
         version: 8,
-        sources: { "osm-tiles": { type: "raster", tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png Ley"], tileSize: 256, attribution: "© OpenStreetMap" } },
+        sources: { 
+          "osm-tiles": { 
+            type: "raster", 
+            tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"], 
+            tileSize: 256, 
+            attribution: "© OpenStreetMap contributors" 
+          } 
+        },
         layers: [{ id: "osm-layer", type: "raster", source: "osm-tiles" }]
       },
       thumbnail: "https://tile.openstreetmap.org/5/23/14.png"
     },
     { 
       id: "dark", 
-      label: "CartoDB Dark Matter", 
+      label: "Dark Gray Canvas", 
       style: {
         version: 8,
-        sources: { "carto-dark-tiles": { type: "raster", tiles: ["https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"], tileSize: 256, attribution: "© CartoDB" } },
+        sources: { 
+          "carto-dark-tiles": { 
+            type: "raster", 
+            tiles: ["https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"], 
+            tileSize: 256, 
+            attribution: "© CartoDB" 
+          } 
+        },
         layers: [{ id: "carto-dark-layer", type: "raster", source: "carto-dark-tiles" }]
       },
       thumbnail: "https://basemaps.cartocdn.com/dark_all/5/23/14.png"
+    },
+    { 
+      id: "satellite", 
+      label: "Imagery with Labels", 
+      style: {
+        version: 8,
+        sources: { 
+          "esri-satellite": { 
+            type: "raster", 
+            tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], 
+            tileSize: 256, 
+            attribution: "© Esri" 
+          },
+          "carto-labels": {
+            type: "raster",
+            tiles: ["https://basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png"],
+            tileSize: 256
+          }
+        },
+        layers: [
+          { id: "satellite-layer", type: "raster", source: "esri-satellite" },
+          { id: "labels-layer", type: "raster", source: "carto-labels" }
+        ]
+      },
+      thumbnail: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/5/14/11"
     }
   ];
 
@@ -71,7 +111,6 @@ export default function WebGISAppsPage() {
             geomType = "point";
           }
 
-          // Assign cartography properties extracted from the layer's SLD text entry
           const sldRule = sldStyles[layer.table_name] || { color: "#3A86FF", width: 2.5, opacity: 0.5 };
 
           return {
@@ -94,13 +133,15 @@ export default function WebGISAppsPage() {
     });
   }, []);
 
-  // 2. Initialize MapLibre Canvas Viewport with Style State Persistence
+  // 2. Initialize MapLibre Viewport
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
+    const initialBasemap = basemaps.find(b => b.id === currentBasemap) || basemaps[1];
+
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: basemaps[1].style as any,
+      style: initialBasemap.style as any,
       center: [69.3451, 30.3753], // Pakistan View Coordinates
       zoom: 5.5,
     });
@@ -108,7 +149,7 @@ export default function WebGISAppsPage() {
     map.addControl(new maplibregl.NavigationControl({ showCompass: true }), "top-right");
     mapRef.current = map;
 
-    // Re-inject active MVT layers instantly when base styles are swapped
+    // Re-inject custom operational layers automatically whenever style canvas modifies
     map.on("style.load", () => {
       gisLayers.forEach((layer) => {
         if (layer.visible) {
@@ -118,7 +159,7 @@ export default function WebGISAppsPage() {
     });
 
     return () => map.remove();
-  }, [gisLayers.length]);
+  }, []); // Run once on load to avoid full re-initialization maps loop glitches
 
   const reapplyLayerToMap = (map: maplibregl.Map, layer: GISLayer) => {
     if (!map.getSource(layer.table_name)) {
@@ -129,7 +170,6 @@ export default function WebGISAppsPage() {
     }
 
     if (!map.getLayer(layer.table_name)) {
-      // TypeScript Safe Separation of Layer Rules using Custom SLD values
       if (layer.geometry_type === "line") {
         map.addLayer({
           id: layer.table_name,
@@ -155,7 +195,6 @@ export default function WebGISAppsPage() {
           }
         });
       } else {
-        // Polygon / Fill configuration using SLD opacity parameters
         map.addLayer({
           id: layer.table_name,
           type: "fill",
@@ -173,7 +212,7 @@ export default function WebGISAppsPage() {
     }
   };
 
-  // 3. Basemap Selection Switch Control
+  // 3. Basemap Switch Controls
   const handleBasemapChange = (styleConfig: any, id: string) => {
     setCurrentBasemap(id);
     if (mapRef.current) {
@@ -205,7 +244,7 @@ export default function WebGISAppsPage() {
   return (
     <div className="w-full h-screen flex overflow-hidden bg-slate-950 font-sans text-slate-200 relative pt-16">
       
-      {/* STATUS FLAG BADGE */}
+      {/* STATUS BADGE */}
       <div className="absolute bottom-4 right-4 z-10 bg-slate-950/80 backdrop-blur-md border border-slate-800/80 rounded-lg px-3 py-1.5 flex items-center space-x-2 pointer-events-none shadow-xl">
         <ShieldCheck className="text-emerald-400" size={14} />
         <span className="text-[10px] font-mono tracking-wider text-slate-400 uppercase">
@@ -213,13 +252,13 @@ export default function WebGISAppsPage() {
         </span>
       </div>
 
-      {/* DASHBOARD CONTROL SIDEBAR */}
+      {/* CONTROL SIDEBAR */}
       <div 
         className={`h-full bg-slate-900 border-r border-slate-800 shadow-2xl flex flex-col transition-all duration-300 z-20 relative ${
           isSidebarOpen ? "w-80 sm:w-96" : "w-0 -translate-x-full"
         }`}
       >
-        {/* Tab Strip Menu Headers */}
+        {/* Tab Header Menu */}
         <div className="flex bg-slate-950 border-b border-slate-800/60 p-1">
           <button 
             onClick={() => setActiveTab("layers")} 
@@ -250,15 +289,15 @@ export default function WebGISAppsPage() {
           </button>
         </div>
 
-        {/* Dynamic Inner Panel Viewport */}
+        {/* Sidebar Content Panel */}
         <div className="flex-1 overflow-y-auto p-5 space-y-6 scrollbar-none">
           
-          {/* VIEW TAB 1: OPERATIONAL DATA LAYERS */}
+          {/* TAB 1: GIS LAYERS */}
           {activeTab === "layers" && (
             <div className="space-y-4">
               <div>
                 <h3 className="text-xs font-bold tracking-wider uppercase font-mono text-slate-400">Database Layers</h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Stream vectors styled via uploaded SLD configuration metadata.</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Stream vectors natively stored within cloud topologies.</p>
               </div>
 
               {loading && (
@@ -289,12 +328,12 @@ export default function WebGISAppsPage() {
             </div>
           )}
 
-          {/* VIEW TAB 2: LIVE SYMBOLOGY LEGEND */}
+          {/* TAB 2: LIVE SYMBOLOGY LEGEND */}
           {activeTab === "legend" && (
             <div className="space-y-4">
               <div>
                 <h3 className="text-xs font-bold tracking-wider uppercase font-mono text-slate-400">Active Map Symbology</h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Live signatures parsed directly from SLD styling profiles.</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Live signatures parsed directly from SLD profiles.</p>
               </div>
               
               <div className="space-y-3 pt-1">
@@ -323,7 +362,7 @@ export default function WebGISAppsPage() {
             </div>
           )}
 
-          {/* VIEW TAB 3: BASEMAP GRID GALLERY */}
+          {/* TAB 3: BASEMAP GRID GALLERY */}
           {activeTab === "basemaps" && (
             <div className="space-y-4">
               <div>
@@ -353,7 +392,7 @@ export default function WebGISAppsPage() {
         </div>
       </div>
 
-      {/* FLOATING COLLAPSIBLE ARROW ACTUATOR */}
+      {/* SIDEBAR ACTUATOR TOGGLE BUTTON */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         className="absolute top-1/2 -translate-y-1/2 z-30 bg-slate-900 border-y border-r border-slate-800 text-slate-400 hover:text-white p-2 rounded-r-xl shadow-2xl transition-all"
@@ -362,7 +401,7 @@ export default function WebGISAppsPage() {
         {isSidebarOpen ? <ChevronLeft size={15} /> : <ChevronRight size={15} />}
       </button>
 
-      {/* RENDER VIEWPORT INTERACTIVE MAP CANVAS */}
+      {/* INTERACTIVE MAP CANVAS CONTAINER */}
       <div className="flex-1 h-full relative bg-slate-950" ref={mapContainerRef} />
     </div>
   );
