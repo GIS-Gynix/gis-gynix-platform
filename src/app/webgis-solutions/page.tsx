@@ -15,6 +15,8 @@ interface GISLayer {
   visible: boolean;
   geometry_type: "line" | "point" | "polygon";
   legend_color: string;
+  stroke_width: number;
+  fill_opacity: number;
 }
 
 export default function WebGISAppsPage() {
@@ -33,7 +35,7 @@ export default function WebGISAppsPage() {
       label: "OpenStreetMap Standard", 
       style: {
         version: 8,
-        sources: { "osm-tiles": { type: "raster", tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"], tileSize: 256, attribution: "© OpenStreetMap" } },
+        sources: { "osm-tiles": { type: "raster", tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png Ley"], tileSize: 256, attribution: "© OpenStreetMap" } },
         layers: [{ id: "osm-layer", type: "raster", source: "osm-tiles" }]
       },
       thumbnail: "https://tile.openstreetmap.org/5/23/14.png"
@@ -50,14 +52,14 @@ export default function WebGISAppsPage() {
     }
   ];
 
-  // 1. Fetch layers and exact QGIS database styles concurrently
+  // 1. Fetch layers and exact SLD styles concurrently
   useEffect(() => {
     Promise.all([
       fetch("/api/layers").then(res => res.json()),
       fetch("/api/styles").then(res => res.json())
     ]).then(([layersData, stylesData]) => {
       if (layersData.success) {
-        const qgisStyles = stylesData.styles || {};
+        const sldStyles = stylesData.styles || {};
         
         const liveLayers = layersData.layers.map((layer: any) => {
           const nameLower = layer.table_name.toLowerCase();
@@ -69,8 +71,8 @@ export default function WebGISAppsPage() {
             geomType = "point";
           }
 
-          // Assign exact QGIS saved XML style hex if present
-          const exactQgisColor = qgisStyles[layer.table_name] || "#3A86FF";
+          // Assign cartography properties extracted from the layer's SLD text entry
+          const sldRule = sldStyles[layer.table_name] || { color: "#3A86FF", width: 2.5, opacity: 0.5 };
 
           return {
             id: layer.id.toString(),
@@ -78,7 +80,9 @@ export default function WebGISAppsPage() {
             display_name: layer.display_name,
             visible: false,
             geometry_type: geomType,
-            legend_color: exactQgisColor
+            legend_color: sldRule.color,
+            stroke_width: sldRule.width,
+            fill_opacity: sldRule.opacity
           };
         });
         setGisLayers(liveLayers);
@@ -104,7 +108,7 @@ export default function WebGISAppsPage() {
     map.addControl(new maplibregl.NavigationControl({ showCompass: true }), "top-right");
     mapRef.current = map;
 
-    // CRITICAL FIX: Re-inject active MVT layers instantly when base styles are swapped
+    // Re-inject active MVT layers instantly when base styles are swapped
     map.on("style.load", () => {
       gisLayers.forEach((layer) => {
         if (layer.visible) {
@@ -114,7 +118,7 @@ export default function WebGISAppsPage() {
     });
 
     return () => map.remove();
-  }, [gisLayers.length === 0]);
+  }, [gisLayers.length]);
 
   const reapplyLayerToMap = (map: maplibregl.Map, layer: GISLayer) => {
     if (!map.getSource(layer.table_name)) {
@@ -125,7 +129,7 @@ export default function WebGISAppsPage() {
     }
 
     if (!map.getLayer(layer.table_name)) {
-      // TypeScript Safe Separation of Layer Rules
+      // TypeScript Safe Separation of Layer Rules using Custom SLD values
       if (layer.geometry_type === "line") {
         map.addLayer({
           id: layer.table_name,
@@ -134,7 +138,7 @@ export default function WebGISAppsPage() {
           "source-layer": layer.table_name,
           paint: {
             "line-color": layer.legend_color,
-            "line-width": 2.5
+            "line-width": layer.stroke_width
           }
         });
       } else if (layer.geometry_type === "point") {
@@ -151,7 +155,7 @@ export default function WebGISAppsPage() {
           }
         });
       } else {
-        // Default to Polygon / Fill configuration
+        // Polygon / Fill configuration using SLD opacity parameters
         map.addLayer({
           id: layer.table_name,
           type: "fill",
@@ -159,7 +163,7 @@ export default function WebGISAppsPage() {
           "source-layer": layer.table_name,
           paint: {
             "fill-color": layer.legend_color,
-            "fill-opacity": 0.5,
+            "fill-opacity": layer.fill_opacity,
             "fill-outline-color": layer.legend_color
           }
         });
@@ -205,7 +209,7 @@ export default function WebGISAppsPage() {
       <div className="absolute bottom-4 right-4 z-10 bg-slate-950/80 backdrop-blur-md border border-slate-800/80 rounded-lg px-3 py-1.5 flex items-center space-x-2 pointer-events-none shadow-xl">
         <ShieldCheck className="text-emerald-400" size={14} />
         <span className="text-[10px] font-mono tracking-wider text-slate-400 uppercase">
-          QGIS Database Symbology Synchronized
+          SLD Cartography Engine Synchronized
         </span>
       </div>
 
@@ -254,7 +258,7 @@ export default function WebGISAppsPage() {
             <div className="space-y-4">
               <div>
                 <h3 className="text-xs font-bold tracking-wider uppercase font-mono text-slate-400">Database Layers</h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Stream vectors natively stored within cloud topologies.</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Stream vectors styled via uploaded SLD configuration metadata.</p>
               </div>
 
               {loading && (
@@ -290,7 +294,7 @@ export default function WebGISAppsPage() {
             <div className="space-y-4">
               <div>
                 <h3 className="text-xs font-bold tracking-wider uppercase font-mono text-slate-400">Active Map Symbology</h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Reflecting live coordinate legend signatures parsed from QGIS metadata.</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Live signatures parsed directly from SLD styling profiles.</p>
               </div>
               
               <div className="space-y-3 pt-1">
@@ -304,12 +308,12 @@ export default function WebGISAppsPage() {
                       <span className="text-xs font-bold text-slate-200">{layer.display_name}</span>
                       <div className="flex items-center space-x-3 pl-1">
                         {layer.geometry_type === "line" ? (
-                          <div className="w-8 h-1.5 rounded-full" style={{ backgroundColor: layer.legend_color }} />
+                          <div className="w-8 rounded-full" style={{ backgroundColor: layer.legend_color, height: `${layer.stroke_width}px` }} />
                         ) : (
-                          <div className="w-5 h-4 rounded border border-white/10" style={{ backgroundColor: layer.legend_color, opacity: 0.5 }} />
+                          <div className="w-5 h-4 rounded border border-white/10" style={{ backgroundColor: layer.legend_color, opacity: layer.fill_opacity }} />
                         )}
-                        <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider text-[10px]">
-                          QGIS Database Style Match
+                        <span className="font-mono text-slate-400 uppercase tracking-wider text-[10px]">
+                          SLD Legend Rule Match
                         </span>
                       </div>
                     </div>

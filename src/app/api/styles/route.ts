@@ -7,46 +7,42 @@ const supabase = createClient(supabaseUrl!, supabaseKey!);
 
 export async function GET() {
   try {
-    const { data: styles, error } = await supabase
-      .from("layer_styles")
-      .select("table_name, styleqml");
+    // Querying your exact table name from the database snapshot
+    const { data: layers, error } = await supabase
+      .from("spatial_layers_registry")
+      .select("table_name, sld_text");
 
-    if (error || !styles || styles.length === 0) {
-      console.warn("layer_styles table missing or empty.");
-      return NextResponse.json({ success: true, styles: {} });
+    if (error || !layers) {
+      return NextResponse.json({ success: false, error: error?.message }, { status: 500 });
     }
 
-    const styleMap: Record<string, string> = {};
+    const styleMap: Record<string, { color: string; width: number; opacity: number }> = {};
 
-    styles.forEach((row: any) => {
-      const qml = row.styleqml || "";
+    layers.forEach((row: any) => {
+      const sld = row.sld_text || "";
       
-      // 1. Try standard XML attribute format: color="#ff0000"
-      let match = qml.match(/color="([^"]+)"/);
+      // Default fallback values if no SLD is uploaded yet
+      let color = "#3A86FF";
+      let width = 2.5;
+      let opacity = 0.5;
+
+      // Robust regex parsing for standard OGC SLD configurations
+      const fillMatch = sld.match(/<se:SvgParameter name="fill">([^<]+)<\/se:SvgParameter>/i) || 
+                        sld.match(/<CssParameter name="fill">([^<]+)<\/CssParameter>/i);
+      const strokeMatch = sld.match(/<se:SvgParameter name="stroke">([^<]+)<\/se:SvgParameter>/i) || 
+                          sld.match(/<CssParameter name="stroke">([^<]+)<\/CssParameter>/i);
+      const widthMatch = sld.match(/<se:SvgParameter name="stroke-width">([^<]+)<\/se:SvgParameter>/i) || 
+                         wl.match(/<CssParameter name="stroke-width">([^<]+)<\/CssParameter>/i);
+      const opacityMatch = sld.match(/<se:SvgParameter name="fill-opacity">([^<]+)<\/se:SvgParameter>/i) || 
+                           sld.match(/<CssParameter name="fill-opacity">([^<]+)<\/CssParameter>/i);
+
+      if (fillMatch) color = fillMatch[1].trim();
+      else if (strokeMatch) color = strokeMatch[1].trim();
       
-      // 2. Try QGIS property tag format: <prop k="color" v="#ff0000"/>
-      if (!match) {
-        match = qml.match(/k="color"\s+v="([^"]+)"/) || qml.match(/v="([^"]+)"\s+k="color"/);
-      }
+      if (widthMatch) width = parseFloat(widthMatch[1].trim()) || 2.5;
+      if (opacityMatch) opacity = parseFloat(opacityMatch[1].trim()) || 0.5;
 
-      // 3. Try fallback outline color tag if main color wasn't caught
-      if (!match) {
-        match = qml.match(/k="outline_color"\s+v="([^"]+)"/);
-      }
-
-      if (match && match[1]) {
-        // Ensure it looks like a valid hex color code
-        let color = match[1].trim();
-        if (!color.startsWith("#") && /^[0-9A-Fa-f]{6}$/.test(color)) {
-          color = `#${color}`;
-        }
-        // If QGIS saved it with an alpha channel (like #ff0000ff), strip the transparency part
-        if (color.startsWith("#") && color.length === 9) {
-          color = color.substring(0, 7);
-        }
-        
-        styleMap[row.table_name] = color;
-      }
+      styleMap[row.table_name] = { color, width, opacity };
     });
 
     return NextResponse.json({ success: true, styles: styleMap });
