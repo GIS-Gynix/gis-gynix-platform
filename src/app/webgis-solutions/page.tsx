@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import { 
-  Layers, Map as MapIcon, List, Eye, EyeOff, ShieldCheck, X 
+  Layers, Map as MapIcon, List, ChevronLeft, ChevronRight, 
+  Eye, EyeOff, ShieldCheck 
 } from "lucide-react";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -22,21 +23,13 @@ export default function WebGISAppsPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   
-  // Widget Open/Close States
-  const [openWidgets, setOpenWidgets] = useState<{
-    layers: boolean;
-    legend: boolean;
-    basemaps: boolean;
-  }>({
-    layers: true,
-    legend: false,
-    basemaps: false
-  });
-
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState<"layers" | "legend" | "basemaps">("layers");
   const [currentBasemap, setCurrentBasemap] = useState("dark");
   const [gisLayers, setGisLayers] = useState<GISLayer[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // 3 Primary Industry-Standard Basemaps (Corrected Tile Links)
   const basemaps = [
     { 
       id: "streets", 
@@ -99,6 +92,7 @@ export default function WebGISAppsPage() {
     }
   ];
 
+  // 1. Fetch layers and exact SLD styles concurrently
   useEffect(() => {
     Promise.all([
       fetch("/api/layers").then(res => res.json()),
@@ -139,6 +133,7 @@ export default function WebGISAppsPage() {
     });
   }, []);
 
+  // 2. Initialize MapLibre Viewport
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
@@ -147,13 +142,14 @@ export default function WebGISAppsPage() {
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
       style: initialBasemap.style as any,
-      center: [69.3451, 30.3753], 
+      center: [69.3451, 30.3753], // Pakistan View Coordinates
       zoom: 5.5,
     });
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: true }), "top-right");
     mapRef.current = map;
 
+    // Re-inject custom operational layers automatically whenever style canvas modifies
     map.on("style.load", () => {
       gisLayers.forEach((layer) => {
         if (layer.visible) {
@@ -163,7 +159,7 @@ export default function WebGISAppsPage() {
     });
 
     return () => map.remove();
-  }, []);
+  }, []); // Run once on load to avoid full re-initialization maps loop glitches
 
   const reapplyLayerToMap = (map: maplibregl.Map, layer: GISLayer) => {
     if (!map.getSource(layer.table_name)) {
@@ -180,7 +176,10 @@ export default function WebGISAppsPage() {
           type: "line",
           source: layer.table_name,
           "source-layer": layer.table_name,
-          paint: { "line-color": layer.legend_color, "line-width": layer.stroke_width }
+          paint: {
+            "line-color": layer.legend_color,
+            "line-width": layer.stroke_width
+          }
         });
       } else if (layer.geometry_type === "point") {
         map.addLayer({
@@ -213,10 +212,7 @@ export default function WebGISAppsPage() {
     }
   };
 
-  const toggleWidget = (widget: "layers" | "legend" | "basemaps") => {
-    setOpenWidgets(prev => ({ ...prev, [widget]: !prev[widget] }));
-  };
-
+  // 3. Basemap Switch Controls
   const handleBasemapChange = (styleConfig: any, id: string) => {
     setCurrentBasemap(id);
     if (mapRef.current) {
@@ -224,14 +220,20 @@ export default function WebGISAppsPage() {
     }
   };
 
+  // 4. Secure Layer Visibility Toggle
   const toggleLayerVisibility = (id: string) => {
     setGisLayers(prev => prev.map(layer => {
       if (layer.id === id) {
         const nextVisibility = !layer.visible;
         const map = mapRef.current;
         if (map) {
-          if (nextVisibility) reapplyLayerToMap(map, layer);
-          else if (map.getLayer(layer.table_name)) map.setLayoutProperty(layer.table_name, "visibility", "none");
+          if (nextVisibility) {
+            reapplyLayerToMap(map, layer);
+          } else {
+            if (map.getLayer(layer.table_name)) {
+              map.setLayoutProperty(layer.table_name, "visibility", "none");
+            }
+          }
         }
         return { ...layer, visible: nextVisibility };
       }
@@ -240,134 +242,167 @@ export default function WebGISAppsPage() {
   };
 
   return (
-    <div className="w-full h-screen relative bg-slate-950 overflow-hidden font-sans text-slate-200">
+    <div className="w-full h-screen flex overflow-hidden bg-slate-950 font-sans text-slate-200 relative pt-16">
       
-      {/* FULL SCREEN INTERACTIVE MAP CANVAS */}
-      <div className="w-full h-full absolute inset-0 z-0" ref={mapContainerRef} />
-
-      {/* TOP LEFT ICON DOCK (Esri Style) */}
-      <div className="absolute top-20 left-4 z-10 flex flex-col space-y-2 bg-slate-900/90 backdrop-blur-md border border-slate-800 p-2 rounded-xl shadow-2xl">
-        <button 
-          onClick={() => toggleWidget("layers")}
-          className={`p-3 rounded-lg transition-all ${openWidgets.layers ? "bg-emerald-500 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-white"}`}
-          title="Operational Layers"
-        >
-          <Layers size={20} />
-        </button>
-        <button 
-          onClick={() => toggleWidget("legend")}
-          className={`p-3 rounded-lg transition-all ${openWidgets.legend ? "bg-cyan-500 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-white"}`}
-          title="Map Symbology Legend"
-        >
-          <List size={20} />
-        </button>
-        <button 
-          onClick={() => toggleWidget("basemaps")}
-          className={`p-3 rounded-lg transition-all ${openWidgets.basemaps ? "bg-amber-500 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-white"}`}
-          title="Basemap Gallery"
-        >
-          <MapIcon size={20} />
-        </button>
-      </div>
-
-      {/* WIDGET 1: LAYER CATALOG (TOP RIGHT WINDOW) */}
-      {openWidgets.layers && (
-        <div className="absolute top-20 right-4 z-10 w-80 sm:w-8c bg-slate-900/95 backdrop-blur-md border border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-          <div className="flex items-center justify-between bg-slate-950/80 px-4 py-3 border-b border-slate-800/60">
-            <div className="flex items-center space-x-2">
-              <Layers size={14} className="text-emerald-400" />
-              <span className="text-xs font-bold uppercase tracking-wider font-mono">Layer List</span>
-            </div>
-            <button onClick={() => toggleWidget("layers")} className="text-slate-500 hover:text-white"><X size={14} /></button>
-          </div>
-          <div className="p-4 max-h-64 overflow-y-auto space-y-2 scrollbar-none">
-            {loading && <div className="text-center py-4 text-xs font-mono text-slate-500 animate-pulse">Loading spatial assets...</div>}
-            {!loading && gisLayers.map(layer => (
-              <div 
-                key={layer.id} 
-                onClick={() => toggleLayerVisibility(layer.id)} 
-                className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer select-none transition-all ${
-                  layer.visible ? "bg-slate-800/60 border-emerald-500/40 text-white" : "bg-slate-950/40 border-slate-800/80 text-slate-400 hover:border-slate-700"
-                }`}
-              >
-                <div className="flex items-center space-x-3">
-                  <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: layer.legend_color }} />
-                  <span className="text-xs font-semibold tracking-wide">{layer.display_name}</span>
-                </div>
-                {layer.visible ? <Eye size={13} className="text-emerald-400" /> : <EyeOff size={13} />}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* WIDGET 2: MAP SYMBOLOGY LEGEND (BOTTOM RIGHT WINDOW) */}
-      {openWidgets.legend && (
-        <div className="absolute bottom-16 right-4 z-10 w-80 bg-slate-900/95 backdrop-blur-md border border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-          <div className="flex items-center justify-between bg-slate-950/80 px-4 py-3 border-b border-slate-800/60">
-            <div className="flex items-center space-x-2">
-              <List size={14} className="text-cyan-400" />
-              <span className="text-xs font-bold uppercase tracking-wider font-mono">Legend</span>
-            </div>
-            <button onClick={() => toggleWidget("legend")} className="text-slate-500 hover:text-white"><X size={14} /></button>
-          </div>
-          <div className="p-4 max-h-60 overflow-y-auto space-y-3 scrollbar-none">
-            {gisLayers.filter(l => l.visible).length === 0 ? (
-              <div className="text-center py-4 text-xs font-mono text-slate-500 border border-dashed border-slate-800 rounded-lg">No layers turned on.</div>
-            ) : (
-              gisLayers.filter(l => l.visible).map(layer => (
-                <div key={layer.id} className="flex flex-col space-y-1.5 pl-1">
-                  <span className="text-xs font-semibold text-slate-300">{layer.display_name}</span>
-                  <div className="flex items-center space-x-3 pl-2">
-                    {layer.geometry_type === "line" ? (
-                      <div className="w-6 rounded-full" style={{ backgroundColor: layer.legend_color, height: `${layer.stroke_width}px` }} />
-                    ) : (
-                      <div className="w-4 h-3 rounded-sm" style={{ backgroundColor: layer.legend_color, opacity: layer.fill_opacity }} />
-                    )}
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500">Active Layer style</span>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* WIDGET 3: BASEMAP GALLERY (FLOATING SIDE-WIDGET) */}
-      {openWidgets.basemaps && (
-        <div className="absolute top-20 left-20 z-10 w-72 bg-slate-900/95 backdrop-blur-md border border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-          <div className="flex items-center justify-between bg-slate-950/80 px-4 py-3 border-b border-slate-800/60">
-            <div className="flex items-center space-x-2">
-              <MapIcon size={14} className="text-amber-400" />
-              <span className="text-xs font-bold uppercase tracking-wider font-mono">Basemaps</span>
-            </div>
-            <button onClick={() => toggleWidget("basemaps")} className="text-slate-500 hover:text-white"><X size={14} /></button>
-          </div>
-          <div className="p-3 grid grid-cols-1 gap-2 max-h-64 overflow-y-auto scrollbar-none">
-            {basemaps.map(bm => (
-              <div 
-                key={bm.id}
-                onClick={() => handleBasemapChange(bm.style, bm.id)}
-                className={`flex items-center space-x-3 p-2 rounded-lg cursor-pointer border transition-all ${
-                  currentBasemap === bm.id ? "bg-amber-500/10 border-amber-400 text-white" : "bg-slate-950/30 border-slate-800 text-slate-400 hover:border-slate-700"
-                }`}
-              >
-                <img src={bm.thumbnail} alt={bm.label} className="w-12 h-10 object-cover rounded border border-slate-800" />
-                <span className="text-xs font-semibold truncate">{bm.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* STATUS SYSTEM BADGE */}
-      <div className="absolute bottom-4 left-4 z-10 bg-slate-950/80 backdrop-blur-md border border-slate-800 px-3 py-1.5 rounded-lg flex items-center space-x-2 pointer-events-none shadow-xl">
+      {/* STATUS BADGE */}
+      <div className="absolute bottom-4 right-4 z-10 bg-slate-950/80 backdrop-blur-md border border-slate-800/80 rounded-lg px-3 py-1.5 flex items-center space-x-2 pointer-events-none shadow-xl">
         <ShieldCheck className="text-emerald-400" size={14} />
         <span className="text-[10px] font-mono tracking-wider text-slate-400 uppercase">
-          Dynamic HUD System Synchronized
+          SLD Cartography Engine Synchronized
         </span>
       </div>
 
+      {/* CONTROL SIDEBAR */}
+      <div 
+        className={`h-full bg-slate-900 border-r border-slate-800 shadow-2xl flex flex-col transition-all duration-300 z-20 relative ${
+          isSidebarOpen ? "w-80 sm:w-96" : "w-0 -translate-x-full"
+        }`}
+      >
+        {/* Tab Header Menu */}
+        <div className="flex bg-slate-950 border-b border-slate-800/60 p-1">
+          <button 
+            onClick={() => setActiveTab("layers")} 
+            className={`flex-1 flex items-center justify-center space-x-1.5 py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
+              activeTab === "layers" ? "bg-slate-800 text-emerald-400" : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Layers size={13} />
+            <span>Layers</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab("legend")} 
+            className={`flex-1 flex items-center justify-center space-x-1.5 py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
+              activeTab === "legend" ? "bg-slate-800 text-cyan-400" : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <List size={13} />
+            <span>Legend</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab("basemaps")} 
+            className={`flex-1 flex items-center justify-center space-x-1.5 py-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
+              activeTab === "basemaps" ? "bg-slate-800 text-amber-400" : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <MapIcon size={13} />
+            <span>Basemaps</span>
+          </button>
+        </div>
+
+        {/* Sidebar Content Panel */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-6 scrollbar-none">
+          
+          {/* TAB 1: GIS LAYERS */}
+          {activeTab === "layers" && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xs font-bold tracking-wider uppercase font-mono text-slate-400">Database Layers</h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">Stream vectors natively stored within cloud topologies.</p>
+              </div>
+
+              {loading && (
+                <div className="text-center py-6 text-xs font-mono text-slate-500 animate-pulse">
+                  Querying spatial entities...
+                </div>
+              )}
+
+              <div className="space-y-2">
+                {!loading && gisLayers.map(layer => (
+                  <div 
+                    key={layer.id} 
+                    onClick={() => toggleLayerVisibility(layer.id)} 
+                    className={`flex items-center justify-between p-3.5 rounded-xl border cursor-pointer select-none transition-all ${
+                      layer.visible 
+                        ? "bg-slate-800/50 border-emerald-500/40 text-white" 
+                        : "bg-slate-950/30 border-slate-800 text-slate-400 hover:border-slate-700"
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <span className="w-3 h-3 rounded-sm opacity-80" style={{ backgroundColor: layer.legend_color }} />
+                      <span className="text-xs font-bold tracking-wide">{layer.display_name}</span>
+                    </div>
+                    {layer.visible ? <Eye size={14} className="text-emerald-400" /> : <EyeOff size={14} />}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: LIVE SYMBOLOGY LEGEND */}
+          {activeTab === "legend" && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xs font-bold tracking-wider uppercase font-mono text-slate-400">Active Map Symbology</h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">Live signatures parsed directly from SLD profiles.</p>
+              </div>
+              
+              <div className="space-y-3 pt-1">
+                {gisLayers.filter(l => l.visible).length === 0 ? (
+                  <div className="border border-dashed border-slate-800 rounded-xl p-6 text-center text-xs font-mono text-slate-500">
+                    No viewport channels active. Enable map layers to fetch styling profiles.
+                  </div>
+                ) : (
+                  gisLayers.filter(l => l.visible).map(layer => (
+                    <div key={layer.id} className="bg-slate-950/40 border border-slate-800/60 p-3.5 rounded-xl flex flex-col space-y-2">
+                      <span className="text-xs font-bold text-slate-200">{layer.display_name}</span>
+                      <div className="flex items-center space-x-3 pl-1">
+                        {layer.geometry_type === "line" ? (
+                          <div className="w-8 rounded-full" style={{ backgroundColor: layer.legend_color, height: `${layer.stroke_width}px` }} />
+                        ) : (
+                          <div className="w-5 h-4 rounded border border-white/10" style={{ backgroundColor: layer.legend_color, opacity: layer.fill_opacity }} />
+                        )}
+                        <span className="font-mono text-slate-400 uppercase tracking-wider text-[10px]">
+                          SLD Legend Rule Match
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: BASEMAP GRID GALLERY */}
+          {activeTab === "basemaps" && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xs font-bold tracking-wider uppercase font-mono text-slate-400">Backdrop Gallery</h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">Switch reference grids without losing toggled geometry overlays.</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                {basemaps.map(bm => (
+                  <div 
+                    key={bm.id}
+                    onClick={() => handleBasemapChange(bm.style, bm.id)}
+                    className={`group relative rounded-xl overflow-hidden cursor-pointer border transition-all ${
+                      currentBasemap === bm.id ? "border-amber-400 scale-[1.02]" : "border-slate-800 hover:border-slate-700"
+                    }`}
+                  >
+                    <img src={bm.thumbnail} alt={bm.label} className="w-full h-20 object-cover opacity-50 group-hover:opacity-75 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                    <div className="absolute bottom-2 left-2 right-2">
+                      <p className="text-[10px] font-bold tracking-wide text-white truncate">{bm.label}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+        </div>
+      </div>
+
+      {/* SIDEBAR ACTUATOR TOGGLE BUTTON */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="absolute top-1/2 -translate-y-1/2 z-30 bg-slate-900 border-y border-r border-slate-800 text-slate-400 hover:text-white p-2 rounded-r-xl shadow-2xl transition-all"
+        style={{ left: isSidebarOpen ? "384px" : "0px" }}
+      >
+        {isSidebarOpen ? <ChevronLeft size={15} /> : <ChevronRight size={15} />}
+      </button>
+
+      {/* INTERACTIVE MAP CANVAS CONTAINER */}
+      <div className="flex-1 h-full relative bg-slate-950" ref={mapContainerRef} />
     </div>
   );
 }
