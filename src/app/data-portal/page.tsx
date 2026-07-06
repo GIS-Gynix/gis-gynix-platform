@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import confetti from "canvas-commetti"; // Assumes your setup uses canvas-confetti
+import confetti from "canvas-confetti"; // Assumes your setup uses canvas-confetti
 import { 
   Database, Search, Download, Filter, 
   Layers, Map, Info, Calendar, HardDrive, Binary, ShieldAlert 
