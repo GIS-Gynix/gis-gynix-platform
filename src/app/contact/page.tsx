@@ -38,7 +38,6 @@ function ContactFormContent() {
     setIsSubmitting(true);
 
     const formDataPayload = new FormData();
-    
     formDataPayload.append("access_key", "53320008-e535-416d-900c-56474751f850");
     formDataPayload.append("name", formData.name);
     formDataPayload.append("email", formData.email);
@@ -61,7 +60,7 @@ function ContactFormContent() {
         alert(`Submission rejected by endpoint: ${result.message || "Unknown error"}`);
       }
     } catch (err) {
-      alert("Network pipeline offline. Check connection or email directly at gisgynix@gmail.com");
+      alert("Network pipeline offline. Check connection or email directly at operations@gisgynix.com");
     } finally {
       setIsSubmitting(false);
     }
@@ -175,10 +174,11 @@ function ContactFormContent() {
                 />
               </div>
 
+              {/* FIXED BUTTON: Changed text tracking and injected hard contrast dark text color */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 rounded-xl bg-gradient-spatial text-brand-dark font-sans font-bold text-sm tracking-wide flex items-center justify-center space-x-2 shadow-lg shadow-brand-cyan/10 hover:shadow-brand-cyan/20 transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50"
+                className="w-full py-4 rounded-xl bg-gradient-spatial text-slate-950 font-sans font-extrabold text-sm uppercase tracking-wider flex items-center justify-center space-x-2 shadow-lg hover:brightness-110 active:scale-[0.99] transition-all disabled:opacity-50"
               >
                 <span>{isSubmitting ? "Transmitting Requirements..." : "Submit Request to Get Service"}</span>
                 <Send size={15} />
