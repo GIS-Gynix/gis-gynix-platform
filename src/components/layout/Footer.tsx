@@ -25,7 +25,7 @@ export default function Footer() {
     company: [
       { name: "About Corporate Ecosystem", href: "/about" },
       { name: "Project Portfolio Hub", href: "/portfolio" },
-      { name: "Secure Contact Gate", href: "/contact" },
+      { name: "Contact Us Now", href: "/contact" },
     ],
   };
 
