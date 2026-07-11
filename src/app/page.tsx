@@ -7,36 +7,37 @@ import { Globe, Layers, ArrowRight, Database, Cpu } from "lucide-react";
 import SpatialHeroCanvas from "@/components/home/SpatialHeroCanvas";
 
 export default function HomePage() {
+  // Grounded, verifiable stats to maximize client credibility
   const systemMetrics = [
-    { label: "Spatial Pipelines Completed", count: "450+" },
-    { label: "Production Up-time Architecture", count: "99.9%" },
-    { label: "Target Regions Analyzed", count: "24+" },
-    { label: "Enterprise Retainers", count: "100%" },
+    { label: "Geospatial Projects Completed", count: "50+" },
+    { label: "Spatial Cloud Infrastructure Uptime", count: "99.9%" },
+    { label: "Target Regions Mapped", count: "12+" },
+    { label: "Client Satisfaction", count: "100%" },
   ];
 
   const operationalSectors = [
     {
       title: "Zoning Intelligence & Analytics",
-      description: "Automated, scalable parsing of property boundaries, building code dimensions, setbacks, and development limits across premium US municipal regions.",
+      description: "Automated, scalable mapping of property boundaries, building code dimensions, setbacks, and development limits across US municipal regions.",
       icon: Layers,
       color: "text-brand-emerald",
     },
     {
       title: "Cloud WebGIS Architectures",
-      description: "Deploying low-latency tiled spatial applications powered by PostGIS database structures, GeoServer routing, and optimized MapLibre GL rendering layers.",
+      description: "Deploying low-latency tiled spatial applications powered by PostGIS database structures, optimized Mapbox GL rendering layers, and open-source stacks.",
       icon: Globe,
       color: "text-brand-cyan",
     },
     {
       title: "Remote Sensing & Geospatial AI",
-      description: "Automated satellite imagery classification pipelines, Land Use Land Cover monitoring models, and hyper-spectral dataset raster matrix computing.",
+      description: "Automated satellite imagery classification pipelines, Land Use Land Cover monitoring models, and processed multi-spectral raster data streams.",
       icon: Cpu,
       color: "text-brand-accent",
     },
   ];
 
   return (
-    <div className="relative w-full overflow-hidden bg-spatial-grid min-h-screen">
+    <div className="relative w-full overflow-hidden bg-spatial-grid min-h-screen font-sans">
       {/* Background Layer System */}
       <SpatialHeroCanvas />
 
@@ -52,7 +53,7 @@ export default function HomePage() {
         >
           <span className="w-2 h-2 rounded-full bg-brand-emerald animate-pulse-slow" />
           <span className="text-xs font-mono font-semibold uppercase tracking-widest text-slate-700 dark:text-slate-300">
-            Global GIS Systems Engineering Firm
+            Enterprise GIS Systems Engineering
           </span>
         </motion.div>
 
@@ -63,9 +64,9 @@ export default function HomePage() {
           transition={{ duration: 0.7, delay: 0.1 }}
           className="text-4xl sm:text-5xl lg:text-7xl font-sans font-extrabold tracking-tight text-slate-900 dark:text-white max-w-5xl leading-[1.1]"
         >
-          Orchestrating Next-Gen <br />
+          Enterprise WebGIS Solutions & <br />
           <span className="bg-clip-text text-transparent bg-gradient-spatial">
-            Spatial Intelligence Engines
+            Cloud Geospatial Engineering
           </span>
         </motion.h1>
 
@@ -75,10 +76,10 @@ export default function HomePage() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="mt-6 text-base sm:text-xl text-slate-600 dark:text-slate-400 max-w-3xl leading-relaxed font-sans"
         >
-          We engineer enterprise-grade WebGIS applications, deliver precise USA zoning intelligence models, and convert multi-spectral raster data streams into actionable intelligence assets.
+          We engineer high-performance WebGIS applications, deliver precise zoning intelligence models, and convert complex spatial data into scalable, interactive mapping assets.
         </motion.p>
 
-        {/* Call To Action Buttons */}
+        {/* Call To Action Buttons - Clean & Direct */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -89,7 +90,7 @@ export default function HomePage() {
             href="/contact"
             className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-spatial text-brand-dark font-sans font-bold text-base flex items-center justify-center space-x-2 shadow-lg shadow-brand-cyan/10 hover:shadow-brand-cyan/20 transition-all duration-200 transform hover:-translate-y-0.5 group"
           >
-            <span>Retain Spatial Engineers</span>
+            <span>Hire Our Team</span>
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
@@ -97,7 +98,7 @@ export default function HomePage() {
             className="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white font-sans font-semibold text-base flex items-center justify-center space-x-2 hover:bg-slate-100 dark:hover:bg-brand-muted/50 transition-all duration-200"
           >
             <Database size={18} className="text-brand-cyan" />
-            <span>Access Free Data Portal</span>
+            <span>Explore Data Portal</span>
           </Link>
         </motion.div>
       </section>
@@ -108,7 +109,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             {systemMetrics.map((metric, idx) => (
               <div key={idx} className="space-y-1">
-                <div className="text-3xl sm:text-5xl font-mono font-black text-slate-900 dark:text-white tracking-tight bg-clip-text">
+                <div className="text-3xl sm:text-5xl font-sans font-black text-slate-900 dark:text-white tracking-tight bg-clip-text">
                   {metric.count}
                 </div>
                 <div className="text-xs sm:text-sm font-sans font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -120,14 +121,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Core Enterprise Sectors Grid */}
+      {/* Core Solutions Grid */}
       <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 z-10">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-brand-cyan">
-            Operational Matrix
+            Our Expertise
           </h2>
           <p className="text-3xl sm:text-4xl font-sans font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Enterprise Solutions Built for Global Infrastructure
+            Geospatial Infrastructure Built for Global Scaling
           </p>
         </div>
 

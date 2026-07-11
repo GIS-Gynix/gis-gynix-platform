@@ -17,8 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GIS Gynix | International Geospatial Intelligence & WebGIS Development",
-  description: "Enterprise spatial data engineering, custom WebGIS system solutions, automated remote sensing pipelines, and expert USA Zoning analysis pipelines.",
+  title: "GIS Gynix | Enterprise WebGIS & Cloud Geospatial Engineering",
+  description: "Global GIS Systems Engineering firm specializing in low-latency WebGIS platforms, premium zoning intelligence models, and automated remote sensing pipelines.",
   metadataBase: new URL("https://gisgynix.com"),
 };
 

@@ -20,6 +20,7 @@ const config: Config = {
         },
       },
       fontFamily: {
+        // Enforces your global font configs universally across all tailwind components
         sans: ["var(--font-geist-sans)", "sans-serif"],
         mono: ["var(--font-geist-mono)", "monospace"],
       },

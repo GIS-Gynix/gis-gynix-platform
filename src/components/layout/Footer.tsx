@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Mail, Phone, MapPin, Globe, ArrowUpRight } from "lucide-react";
+import { Mail, MapPin, ArrowUpRight } from "lucide-react";
 
 export default function Footer() {
   const navigationGrid = {
@@ -15,12 +15,11 @@ export default function Footer() {
     resources: [
       { name: "Pakistan GIS Data Portal", href: "/data-portal" },
       { name: "Geospatial Articles", href: "/blog" },
-      { name: "Developer Tools", href: "#" }, // Safely pointed to '#' until built
     ],
     company: [
-      { name: "About Corporate Ecosystem", href: "/about" },
-      { name: "Project Portfolio Hub", href: "/portfolio" },
-      { name: "Secure Contact Gate", href: "/contact" },
+      { name: "About Our Team", href: "/about" },
+      { name: "Project Portfolio", href: "/portfolio" },
+      { name: "Contact Our Team", href: "/contact" },
     ],
   };
 
@@ -37,49 +36,69 @@ export default function Footer() {
             <span className="font-extrabold text-lg uppercase tracking-wider text-white">GIS Gynix</span>
           </div>
           <p className="text-sm leading-relaxed text-slate-400 max-w-sm">
-            International tier spatial engineering collective specializing in real-time Cloud WebGIS deployment, modern vector-tile optimization architectures, and zoning intelligence orchestration models.
+            Global GIS Systems Engineering & Strategic Geospatial Intelligence. We design and deploy high-performance spatial cloud infrastructure worldwide alongside dedicated regional open-data repositories.
           </p>
           <div className="pt-2 space-y-2 text-xs font-mono">
-            <div className="flex items-center space-x-2"><Mail size={14} className="text-brand-cyan" /> <span>operations@gisgynix.com</span></div>
-            <div className="flex items-center space-x-2"><MapPin size={14} className="text-brand-cyan" /> <span>Global Delivery Network</span></div>
+            <div className="flex items-center space-x-2">
+              <Mail size={14} className="text-brand-cyan" /> 
+              <span>gisgynix@gmail.com</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <MapPin size={14} className="text-brand-cyan" /> 
+              <span>Global Services & Regional Portals</span>
+            </div>
           </div>
         </div>
 
-        {/* Iterative Sub-Link Directories */}
+        {/* Directory Sub-Links */}
         <div>
           <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-4">Core Solutions</h4>
           <ul className="space-y-2.5 text-sm">
             {navigationGrid.solutions.map((item) => (
-              <li key={item.name}><Link href={item.href} className="hover:text-brand-emerald transition-colors duration-150 flex items-center group">{item.name} <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
+              <li key={item.name}>
+                <Link href={item.href} className="hover:text-brand-emerald transition-colors duration-150 flex items-center group">
+                  {item.name} 
+                  <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              </li>
             ))}
           </ul>
         </div>
 
         <div>
-          <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-4">Resources</h4>
+          <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-4">Data & Insights</h4>
           <ul className="space-y-2.5 text-sm">
             {navigationGrid.resources.map((item) => (
-              <li key={item.name}><Link href={item.href} className="hover:text-brand-cyan transition-colors duration-150 flex items-center group">{item.name} <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
+              <li key={item.name}>
+                <Link href={item.href} className="hover:text-brand-cyan transition-colors duration-150 flex items-center group">
+                  {item.name} 
+                  <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              </li>
             ))}
           </ul>
         </div>
 
         <div>
-          <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-4">Corporate</h4>
+          <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-4">Company</h4>
           <ul className="space-y-2.5 text-sm">
             {navigationGrid.company.map((item) => (
-              <li key={item.name}><Link href={item.href} className="hover:text-brand-accent transition-colors duration-150 flex items-center group">{item.name} <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
+              <li key={item.name}>
+                <Link href={item.href} className="hover:text-brand-accent transition-colors duration-150 flex items-center group">
+                  {item.name} 
+                  <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              </li>
             ))}
           </ul>
         </div>
       </div>
 
+      {/* Bottom Footer Credits Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-slate-600">
-        <p>&copy; {new Date().getFullYear()} GIS Gynix. All rights engineered internationally.</p>
-        <div className="flex space-x-6 mt-4 sm:mt-0">
-          {/* Changed destinations to '#' and set prefetch false to secure routing integrity */}
-          <Link href="#" prefetch={false} className="hover:text-slate-400">Security Architecture</Link>
-          <Link href="#" prefetch={false} className="hover:text-slate-400">Terms of Deployment</Link>
+        <p>&copy; {new Date().getFullYear()} GIS Gynix. All rights reserved.</p>
+        <div className="flex space-x-6 mt-4 sm:mt-0 text-slate-500">
+          <span>Enterprise Geospatial Deployments</span>
         </div>
       </div>
     </footer>
