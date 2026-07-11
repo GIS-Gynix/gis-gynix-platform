@@ -136,7 +136,7 @@ export default function ZoningIntelligencePage() {
                   : "text-slate-600 dark:text-slate-400"
               }`}
             >
-              Ad-Hoc Requests
+              Requests Zoning
             </button>
             <button
               onClick={() => setBillingCycle("retainer")}
@@ -146,7 +146,7 @@ export default function ZoningIntelligencePage() {
                   : "text-slate-600 dark:text-slate-400"
               }`}
             >
-              Volume Retainer (Discounted)
+              Request Zoning (Discounted, If you are ordering our services for first time)
             </button>
           </div>
         </div>
