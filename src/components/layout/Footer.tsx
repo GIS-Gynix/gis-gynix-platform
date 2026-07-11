@@ -42,7 +42,7 @@ export default function Footer() {
           <div className="pt-2 space-y-2 text-xs font-mono">
             <div className="flex items-center space-x-2">
               <Mail size={14} className="text-brand-cyan" /> 
-              <span>operations@gisgynix.com</span>
+              <span>gisgynix@gmail.com</span>
             </div>
             <div className="flex items-center space-x-2">
               <MapPin size={14} className="text-brand-cyan" /> 
