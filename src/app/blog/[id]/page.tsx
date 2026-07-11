@@ -4,7 +4,19 @@ import React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, Clock, Tag, BookOpen, Terminal, Shield, CheckCircle } from "lucide-react";
+import { 
+  ArrowLeft, 
+  Calendar, 
+  Clock, 
+  Tag, 
+  BookOpen, 
+  Terminal, 
+  Shield, 
+  CheckCircle, 
+  Layers, 
+  Server, 
+  Activity 
+} from "lucide-react";
 
 // Deep engineering database mapping dynamic articles
 const dynamicArticlesContent: Record<string, {
