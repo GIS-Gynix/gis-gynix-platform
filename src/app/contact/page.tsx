@@ -37,10 +37,8 @@ function ContactFormContent() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Create native browser FormData object for reliable transmission
     const formDataPayload = new FormData();
     
-    // Append fields exactly as Web3Forms endpoints expect them
     formDataPayload.append("access_key", "53320008-e535-416d-900c-56474751f850");
     formDataPayload.append("name", formData.name);
     formDataPayload.append("email", formData.email);
@@ -50,7 +48,6 @@ function ContactFormContent() {
     formDataPayload.append("subject", `New GIS Gynix Project Request from ${formData.name}`);
 
     try {
-      // Send as multipart standard form data payload
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         body: formDataPayload,
@@ -64,7 +61,7 @@ function ContactFormContent() {
         alert(`Submission rejected by endpoint: ${result.message || "Unknown error"}`);
       }
     } catch (err) {
-      alert("Network pipeline offline. Check connection or email directly at gisgynix@gmail.com");
+      alert("Network pipeline offline. Check connection or email directly at operations@gisgynix.com");
     } finally {
       setIsSubmitting(false);
     }
@@ -198,7 +195,7 @@ function ContactFormContent() {
               </div>
               <h3 className="text-2xl font-sans font-black text-slate-900 dark:text-white">Request Sent Successfully!</h3>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed mx-auto">
-                Your specifications have been routed straight to gisgynix@gmail.com. Our core engineering team will contact you shortly.
+                Your specifications have been routed straight to our team. Our core engineering team will contact you shortly.
               </p>
               <button
                 onClick={() => setSubmitted(false)}
@@ -262,8 +259,8 @@ function ContactFormContent() {
             </div>
           </div>
         </div>
+      </div> {/* Added back the missing closing wrapper tag */}
 
-        
     </section>
   );
 }
@@ -275,12 +272,12 @@ export default function ContactPage() {
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-surface/50 backdrop-blur-md">
           <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan" />
           <span className="text-[11px] font-mono uppercase tracking-widest text-slate-600 dark:text-slate-400">
-            Secure Inbound Pipeline
+            Contact Channels
           </span>
         </div>
         <h1 className="text-4xl sm:text-5xl font-sans font-black text-slate-900 dark:text-white tracking-tight">
-          Retain Spatial Engineers <br />
-          <span className="bg-clip-text text-transparent bg-gradient-spatial">Initialize System Calibration</span>
+          Contact Our Team <br />
+          <span className="bg-clip-text text-transparent bg-gradient-spatial">Scope Your Project Specifications</span>
         </h1>
       </section>
 
