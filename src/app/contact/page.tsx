@@ -263,11 +263,7 @@ function ContactFormContent() {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-200 dark:border-slate-800 mt-6 flex items-center justify-between text-[11px] font-mono text-slate-400">
-          <span>ROUTING VIA WEB3FORMS (FORM DATA)</span>
-          <span className="text-brand-emerald font-bold">● LIVE INBOX CONDUIT</span>
-        </div>
-      </div>
+        
     </section>
   );
 }
