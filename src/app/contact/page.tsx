@@ -78,9 +78,9 @@ function ContactFormContent() {
   };
 
   const timelineNames: Record<string, string> = {
-    urgent: "Ad-Hoc / Rapid Support Sprint",
+    urgent: "Rapid Support Sprint",
     "1-month": "1-Month Development Cycle",
-    "3-months": "3.5-Month Milestone Contract",
+    "Milwstone": "Milestone Contract",
     retainer: "Long-Term Agency Developer Retainer"
   };
 
@@ -140,7 +140,7 @@ function ContactFormContent() {
                   >
                     <option value="webgis">Cloud WebGIS App</option>
                     <option value="zoning">USA Zoning Analysis</option>
-                    <option value="remote-sensing">Remote Sensing AI</option>
+                    <option value="remote-sensing">GIS & Remote Sensing</option>
                     <option value="automation">Python Spatial Scripting</option>
                   </select>
                 </div>
@@ -155,9 +155,9 @@ function ContactFormContent() {
                     onChange={handleInputChange}
                     className="w-full px-3 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-dark/50 font-sans text-sm outline-none focus:border-brand-cyan/60 dark:text-white transition-colors cursor-pointer"
                   >
-                    <option value="urgent">Ad-Hoc / Rapid Support</option>
+                    <option value="urgent">Rapid Support</option>
                     <option value="1-month">1 Month Sprint</option>
-                    <option value="3-months">3.5 Months (Fiverr/Upwork)</option>
+                    <option value="Milestone">Milestone Contract</option>
                     <option value="retainer">Long-Term Retainer</option>
                   </select>
                 </div>
