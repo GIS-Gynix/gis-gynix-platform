@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { 
   Globe, Layers, Cpu, Code, ArrowRight, 
-  CheckCircle, Database, Server, LineChart 
+  CheckCircle 
 } from "lucide-react";
 
 export default function ServicesPage() {
@@ -133,7 +133,6 @@ export default function ServicesPage() {
                 </ul>
               </div>
 
-              {/* ACTION BUTTON: High-Contrast Layout Fixing Dark & Light Readability Errors */}
               <div className="pt-8">
                 <Link
                   href={`/contact?service=${sector.id}`}
@@ -166,7 +165,7 @@ export default function ServicesPage() {
               href="/contact"
               className="inline-flex px-8 py-4 rounded-xl bg-gradient-spatial text-slate-950 font-sans font-black text-xs uppercase tracking-wider shadow-lg hover:brightness-110 active:scale-[0.99] transition-all"
             >
-              Consult Our Specialist's Now
+              Consult Our Specialists Now
             </Link>
           </div>
         </div>
