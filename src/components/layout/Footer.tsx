@@ -39,7 +39,7 @@ export default function Footer() {
     { 
       name: "Upwork", 
       href: "https://www.upwork.com/freelancers/~014c5dfcb05a8b2acb?mp_source=share", 
-      iconUrl: "https://cdn-icons-png.flaticon.com/128/15527/15527365.png",
+      iconUrl: "https://img.icons8.com/?size=100&id=fF39hkEhFlir&format=png",
       needsInvert: true // Flips the dark icon to white for premium dark mode contrast
     },
     { 
