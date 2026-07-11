@@ -7,7 +7,6 @@ import { Globe, Layers, ArrowRight, Database, Cpu } from "lucide-react";
 import SpatialHeroCanvas from "@/components/home/SpatialHeroCanvas";
 
 export default function HomePage() {
-  // Grounded, verifiable stats to maximize client credibility
   const systemMetrics = [
     { label: "Geospatial Projects Completed", count: "50+" },
     { label: "Spatial Cloud Infrastructure Uptime", count: "99.9%" },
@@ -38,13 +37,10 @@ export default function HomePage() {
 
   return (
     <div className="relative w-full overflow-hidden bg-spatial-grid min-h-screen font-sans">
-      {/* Background Layer System */}
       <SpatialHeroCanvas />
 
-      {/* Main Hero Container */}
       <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 flex flex-col items-center justify-center text-center z-10">
         
-        {/* Top Operational Pill Tag */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -52,12 +48,12 @@ export default function HomePage() {
           className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-surface/50 backdrop-blur-md mb-8"
         >
           <span className="w-2 h-2 rounded-full bg-brand-emerald animate-pulse-slow" />
+          {/* CHANGED: Made tag text default to slate-700 and dim to slate-300 in dark mode */}
           <span className="text-xs font-mono font-semibold uppercase tracking-widest text-slate-700 dark:text-slate-300">
             Enterprise GIS Systems Engineering
           </span>
         </motion.div>
 
-        {/* Core Marketing Value Statement */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -74,12 +70,12 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-6 text-base sm:text-xl text-slate-600 dark:text-slate-400 max-w-3xl leading-relaxed font-sans"
+          {/* CHANGED: Changed text-slate-600 to dark:text-slate-400 layout parameters */}
+          className="mt-6 text-base sm:text-xl text-slate-700 dark:text-slate-400 max-w-3xl leading-relaxed font-sans"
         >
           We engineer high-performance WebGIS applications, deliver precise zoning intelligence models, and convert complex spatial data into scalable, interactive mapping assets.
         </motion.p>
 
-        {/* Call To Action Buttons - Clean & Direct */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -103,7 +99,6 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Production Analytics Grid Section */}
       <section className="relative border-y border-slate-200 dark:border-slate-900 bg-white/40 dark:bg-brand-surface/20 backdrop-blur-sm z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
@@ -112,7 +107,8 @@ export default function HomePage() {
                 <div className="text-3xl sm:text-5xl font-sans font-black text-slate-900 dark:text-white tracking-tight bg-clip-text">
                   {metric.count}
                 </div>
-                <div className="text-xs sm:text-sm font-sans font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                {/* CHANGED: Made metric label dark:text-slate-400 responsive */}
+                <div className="text-xs sm:text-sm font-sans font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
                   {metric.label}
                 </div>
               </div>
@@ -121,7 +117,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Core Solutions Grid */}
       <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 z-10">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-brand-cyan">
@@ -146,7 +141,8 @@ export default function HomePage() {
                 <h3 className="text-xl font-sans font-bold text-slate-900 dark:text-white group-hover:text-brand-cyan transition-colors">
                   {sector.title}
                 </h3>
-                <p className="text-sm font-sans text-slate-600 dark:text-slate-400 leading-relaxed flex-grow">
+                {/* CHANGED: Swapped default text-slate-600 to text-slate-700 dark:text-slate-400 */}
+                <p className="text-sm font-sans text-slate-700 dark:text-slate-400 leading-relaxed flex-grow">
                   {sector.description}
                 </p>
               </div>

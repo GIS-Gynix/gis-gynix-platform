@@ -105,7 +105,7 @@ function ContactFormContent() {
                   value={formData.name}
                   onChange={handleInputChange}
                   placeholder="e.g., Alexander Wright"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-dark/50 font-sans text-sm outline-none focus:border-brand-emerald/60 dark:text-white transition-colors"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-dark/50 font-sans text-sm outline-none focus:border-brand-emerald/60 text-slate-900 dark:text-white transition-colors"
                 />
               </div>
 
@@ -120,7 +120,7 @@ function ContactFormContent() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="e.g., wright@enterprise.com"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-dark/50 font-sans text-sm outline-none focus:border-brand-emerald/60 dark:text-white transition-colors"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-dark/50 font-sans text-sm outline-none focus:border-brand-emerald/60 text-slate-900 dark:text-white transition-colors"
                 />
               </div>
 
@@ -133,7 +133,7 @@ function ContactFormContent() {
                     name="sector"
                     value={formData.sector}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-dark/50 font-sans text-sm outline-none focus:border-brand-cyan/60 dark:text-white transition-colors cursor-pointer"
+                    className="w-full px-3 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-dark/50 font-sans text-sm outline-none focus:border-brand-cyan/60 text-slate-900 dark:text-white transition-colors cursor-pointer"
                   >
                     <option value="webgis">Cloud WebGIS App</option>
                     <option value="zoning">USA Zoning Analysis</option>
@@ -150,7 +150,7 @@ function ContactFormContent() {
                     name="timeline"
                     value={formData.timeline}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-dark/50 font-sans text-sm outline-none focus:border-brand-cyan/60 dark:text-white transition-colors cursor-pointer"
+                    className="w-full px-3 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-dark/50 font-sans text-sm outline-none focus:border-brand-cyan/60 text-slate-900 dark:text-white transition-colors cursor-pointer"
                   >
                     <option value="urgent">Rapid Support</option>
                     <option value="1-month">1 Month Sprint</option>
@@ -171,7 +171,7 @@ function ContactFormContent() {
                   value={formData.details}
                   onChange={handleInputChange}
                   placeholder="Please describe your project requirements, target area, or dataset details..."
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-dark/50 font-sans text-sm outline-none focus:border-brand-emerald/60 dark:text-white transition-colors resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-dark/50 font-sans text-sm outline-none focus:border-brand-emerald/60 text-slate-900 dark:text-white transition-colors resize-none"
                 />
               </div>
 
@@ -224,42 +224,44 @@ function ContactFormContent() {
 
           <div className="space-y-5 font-sans">
             <div className="space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Client Identity</span>
+              {/* CHANGED: Swapped default text-slate-400 to text-slate-500 dark:text-slate-400 */}
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Client Identity</span>
               <p className="text-base font-extrabold text-slate-900 dark:text-white">
                 {formData.name || <span className="text-slate-500 font-normal italic">Awaiting entry...</span>}
               </p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Comms Target</span>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Comms Target</span>
               <p className="text-base font-medium font-mono text-brand-cyan break-all">
                 {formData.email || <span className="text-slate-500 font-sans font-normal italic">Awaiting entry...</span>}
               </p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Target Domain Module</span>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Target Domain Module</span>
               <p className="text-base font-bold text-slate-900 dark:text-brand-emerald">
                 {sectorNames[formData.sector]}
               </p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Development lifecycle</span>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Development lifecycle</span>
               <p className="text-base font-bold text-slate-900 dark:text-white">
                 {timelineNames[formData.timeline]}
               </p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Project Requirements</span>
-              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-h-32 overflow-y-auto scrollbar-none bg-slate-950/20 p-3 rounded-xl border border-slate-200 dark:border-slate-800/60 min-h-[64px]">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Project Requirements</span>
+              {/* CHANGED: Made summary output field content dark-mode aware */}
+              <p className="text-sm text-slate-800 dark:text-slate-300 leading-relaxed max-h-32 overflow-y-auto scrollbar-none bg-slate-950/5 dark:bg-slate-950/20 p-3 rounded-xl border border-slate-200 dark:border-slate-800/60 min-h-[64px]">
                 {formData.details || <span className="text-slate-500 italic">Please outline what you need...</span>}
               </p>
             </div>
           </div>
         </div>
-      </div> {/* Added back the missing closing wrapper tag */}
+      </div>
 
     </section>
   );
