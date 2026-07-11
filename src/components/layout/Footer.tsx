@@ -25,7 +25,7 @@ export default function Footer() {
     company: [
       { name: "About Corporate Ecosystem", href: "/about" },
       { name: "Project Portfolio Hub", href: "/portfolio" },
-      { name: "Contact Us Now", href: "/contact" },
+      { name: "Secure Contact Gate", href: "/contact" },
     ],
   };
 
@@ -33,22 +33,26 @@ export default function Footer() {
     { 
       name: "Fiverr", 
       href: "https://www.fiverr.com/s/qDEo8Ay", 
-      iconUrl: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/fiverr-icon.png" 
+      iconUrl: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/fiverr-icon.png",
+      needsInvert: false 
     },
     { 
       name: "Upwork", 
       href: "https://www.upwork.com/freelancers/~014c5dfcb05a8b2acb?mp_source=share", 
-      iconUrl: "https://cdn-icons-png.flaticon.com/128/15527/15527365.png" 
+      iconUrl: "https://cdn-icons-png.flaticon.com/128/15527/15527365.png",
+      needsInvert: true // Flips the dark icon to white for premium dark mode contrast
     },
     { 
       name: "Facebook", 
       href: "https://www.facebook.com/profile.php?id=61553547554500", 
-      iconUrl: "https://cdn-icons-png.flaticon.com/128/15047/15047435.png" 
+      iconUrl: "https://cdn-icons-png.flaticon.com/128/15047/15047435.png",
+      needsInvert: false 
     },
     { 
       name: "WhatsApp", 
       href: "https://wa.me/923375316392", 
-      iconUrl: "https://cdn-icons-png.flaticon.com/128/3536/3536445.png" 
+      iconUrl: "https://cdn-icons-png.flaticon.com/128/3536/3536445.png",
+      needsInvert: false 
     },
   ];
 
@@ -125,10 +129,10 @@ export default function Footer() {
             </ul>
           </div>
           
-          {/* Social Network Section with Custom Branded Image Assets */}
+          {/* Social Network Section with Standard Fixed Sizes */}
           <div className="lg:pt-6">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">Connect Network</h4>
-            <div className="flex items-center gap-4.5">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">Social Network</h4>
+            <div className="flex items-center space-x-4">
               {socialLinks.map((social) => (
                 <a
                   key={social.name}
@@ -136,13 +140,17 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   title={social.name}
-                  className="transition-transform duration-200 hover:scale-110 block shrink-0 brightness-90 hover:brightness-100"
+                  className="transition-all duration-200 hover:scale-110 block shrink-0"
                 >
-                  <img 
-                    src={social.iconUrl} 
-                    alt={`${social.name} logo`}
-                    className="h-4.5 w-4.5 object-contain" 
-                  />
+                  <div className="w-5 h-5 relative flex items-center justify-center">
+                    <img 
+                      src={social.iconUrl} 
+                      alt={`${social.name} logo`}
+                      className={`h-5 w-5 object-contain block select-none ${
+                        social.needsInvert ? "invert dark:invert-0 brightness-200 dark:brightness-100" : ""
+                      }`} 
+                    />
+                  </div>
                 </a>
               ))}
             </div>
