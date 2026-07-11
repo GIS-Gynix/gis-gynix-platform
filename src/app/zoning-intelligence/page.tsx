@@ -85,11 +85,11 @@ export default function ZoningIntelligencePage() {
         >
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
           <span className="text-[11px] font-mono uppercase tracking-widest text-slate-600 dark:text-slate-400">
-            US Municipal Feasibility Portal
+            USA, Australia and Canada zoning Portal
           </span>
         </motion.div>
         <h1 className="text-4xl sm:text-5xl font-sans font-black text-slate-900 dark:text-white tracking-tight">
-          De-Risking Land Development via <br />
+          Risk-free development through smart zoning<br />
           <span className="bg-clip-text text-transparent bg-gradient-spatial">Automated Zoning Intelligence</span>
         </h1>
         <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
@@ -123,7 +123,7 @@ export default function ZoningIntelligencePage() {
       <section className="max-w-6xl mx-auto space-y-12 mb-20">
         <div className="text-center space-y-4">
           <h2 className="text-2xl sm:text-3xl font-sans font-extrabold text-slate-900 dark:text-white">
-            Transparent Pricing Models
+            General Pricing Models
           </h2>
           
           {/* Cycle Switch Toggle */}
@@ -146,7 +146,7 @@ export default function ZoningIntelligencePage() {
                   : "text-slate-600 dark:text-slate-400"
               }`}
             >
-              Request Zoning (Discounted, If you are ordering our services for first time)
+              Request Zoning (Discounted, for new customers)
             </button>
           </div>
         </div>
