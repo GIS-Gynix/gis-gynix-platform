@@ -48,7 +48,6 @@ export default function HomePage() {
           className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-surface/50 backdrop-blur-md mb-8"
         >
           <span className="w-2 h-2 rounded-full bg-brand-emerald animate-pulse-slow" />
-          {/* CHANGED: Made tag text default to slate-700 and dim to slate-300 in dark mode */}
           <span className="text-xs font-mono font-semibold uppercase tracking-widest text-slate-700 dark:text-slate-300">
             Enterprise GIS Systems Engineering
           </span>
@@ -70,7 +69,6 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          {/* CHANGED: Changed text-slate-600 to dark:text-slate-400 layout parameters */}
           className="mt-6 text-base sm:text-xl text-slate-700 dark:text-slate-400 max-w-3xl leading-relaxed font-sans"
         >
           We engineer high-performance WebGIS applications, deliver precise zoning intelligence models, and convert complex spatial data into scalable, interactive mapping assets.
@@ -107,7 +105,6 @@ export default function HomePage() {
                 <div className="text-3xl sm:text-5xl font-sans font-black text-slate-900 dark:text-white tracking-tight bg-clip-text">
                   {metric.count}
                 </div>
-                {/* CHANGED: Made metric label dark:text-slate-400 responsive */}
                 <div className="text-xs sm:text-sm font-sans font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
                   {metric.label}
                 </div>
@@ -141,7 +138,6 @@ export default function HomePage() {
                 <h3 className="text-xl font-sans font-bold text-slate-900 dark:text-white group-hover:text-brand-cyan transition-colors">
                   {sector.title}
                 </h3>
-                {/* CHANGED: Swapped default text-slate-600 to text-slate-700 dark:text-slate-400 */}
                 <p className="text-sm font-sans text-slate-700 dark:text-slate-400 leading-relaxed flex-grow">
                   {sector.description}
                 </p>
