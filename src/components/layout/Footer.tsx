@@ -2,7 +2,12 @@
 
 import React from "react";
 import Link from "next/link";
-import { Mail, MapPin, ArrowUpRight } from "lucide-react";
+import { 
+  Mail, 
+  Phone, 
+  MapPin, 
+  ArrowUpRight 
+} from "lucide-react";
 
 export default function Footer() {
   const navigationGrid = {
@@ -15,14 +20,37 @@ export default function Footer() {
     resources: [
       { name: "Pakistan GIS Data Portal", href: "/data-portal" },
       { name: "Geospatial Articles", href: "/blog" },
-      { name: "Developer Tools", href: "#" },
+      { name: "Developer Tools", href: "#" }, 
     ],
     company: [
       { name: "About Corporate Ecosystem", href: "/about" },
       { name: "Project Portfolio Hub", href: "/portfolio" },
-      { name: "Secure Contact Gate", href: "/contact" },
+      { name: "Contact Us Now", href: "/contact" },
     ],
   };
+
+  const socialLinks = [
+    { 
+      name: "Fiverr", 
+      href: "https://www.fiverr.com/s/qDEo8Ay", 
+      iconUrl: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/fiverr-icon.png" 
+    },
+    { 
+      name: "Upwork", 
+      href: "https://www.upwork.com/freelancers/~014c5dfcb05a8b2acb?mp_source=share", 
+      iconUrl: "https://cdn-icons-png.flaticon.com/128/15527/15527365.png" 
+    },
+    { 
+      name: "Facebook", 
+      href: "https://www.facebook.com/profile.php?id=61553547554500", 
+      iconUrl: "https://cdn-icons-png.flaticon.com/128/15047/15047435.png" 
+    },
+    { 
+      name: "WhatsApp", 
+      href: "https://wa.me/923375316392", 
+      iconUrl: "https://cdn-icons-png.flaticon.com/128/3536/3536445.png" 
+    },
+  ];
 
   return (
     <footer className="w-full bg-slate-950 text-slate-400 border-t border-slate-900 font-sans pt-16 pb-8 z-10 relative">
@@ -39,10 +67,14 @@ export default function Footer() {
           <p className="text-sm leading-relaxed text-slate-400 max-w-sm">
             International tier spatial engineering collective specializing in real-time Cloud WebGIS deployment, modern vector-tile optimization architectures, and zoning intelligence orchestration models.
           </p>
-          <div className="pt-2 space-y-2 text-xs font-mono">
+          <div className="pt-2 space-y-2.5 text-xs font-mono">
             <div className="flex items-center space-x-2">
               <Mail size={14} className="text-brand-cyan" /> 
               <span>gisgynix@gmail.com</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Phone size={14} className="text-brand-cyan" /> 
+              <span>+923375316392</span>
             </div>
             <div className="flex items-center space-x-2">
               <MapPin size={14} className="text-brand-cyan" /> 
@@ -57,9 +89,8 @@ export default function Footer() {
           <ul className="space-y-2.5 text-sm">
             {navigationGrid.solutions.map((item) => (
               <li key={item.name}>
-                <Link href={item.href} className="text-slate-400 hover:text-brand-emerald transition-colors duration-150 flex items-center group">
-                  {item.name} 
-                  <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Link href={item.href} className="hover:text-brand-emerald transition-colors duration-150 flex items-center group">
+                  {item.name} <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Link>
               </li>
             ))}
@@ -71,28 +102,53 @@ export default function Footer() {
           <ul className="space-y-2.5 text-sm">
             {navigationGrid.resources.map((item) => (
               <li key={item.name}>
-                <Link href={item.href} className="text-slate-400 hover:text-brand-cyan transition-colors duration-150 flex items-center group">
-                  {item.name} 
-                  <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Link href={item.href} className="hover:text-brand-cyan transition-colors duration-150 flex items-center group">
+                  {item.name} <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Link>
               </li>
             ))}
           </ul>
         </div>
 
-        <div>
-          <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-4">Corporate</h4>
-          <ul className="space-y-2.5 text-sm">
-            {navigationGrid.company.map((item) => (
-              <li key={item.name}>
-                <Link href={item.href} className="text-slate-400 hover:text-brand-accent transition-colors duration-150 flex items-center group">
-                  {item.name} 
-                  <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
-              </li>
-            ))}
-          </ul>
+        {/* Corporate & Social Gateway Layout */}
+        <div className="flex flex-col justify-between space-y-6 lg:space-y-0">
+          <div>
+            <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-4">Corporate</h4>
+            <ul className="space-y-2.5 text-sm">
+              {navigationGrid.company.map((item) => (
+                <li key={item.name}>
+                  <Link href={item.href} className="hover:text-brand-accent transition-colors duration-150 flex items-center group">
+                    {item.name} <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Social Network Section with Custom Branded Image Assets */}
+          <div className="lg:pt-6">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">Connect Network</h4>
+            <div className="flex items-center gap-4.5">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={social.name}
+                  className="transition-transform duration-200 hover:scale-110 block shrink-0 brightness-90 hover:brightness-100"
+                >
+                  <img 
+                    src={social.iconUrl} 
+                    alt={`${social.name} logo`}
+                    className="h-4.5 w-4.5 object-contain" 
+                  />
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
+
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-slate-600">
