@@ -4,31 +4,66 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
+  --foreground-rgb: 15, 23, 42; /* Clean slate-900 for absolute readability */
+  --background-start-rgb: 248, 250, 252; /* slate-50 background */
   --background-end-rgb: 255, 255, 255;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background-start-rgb: 3, 7, 18; /* brand-dark #030712 */
+    --background-end-rgb: 11, 19, 41; /* brand-surface #0B1329 */
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+/* Base style resets to guarantee contrast ratios across the entire document */
+@layer base {
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: rgb(var(--background-start-rgb));
+  }
+
+  /* Force headers to be high contrast dark-slate in light mode, crisp white in dark mode */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-slate-900 dark:text-white tracking-tight transition-colors duration-200;
+  }
+
+  /* Automatically make paragraphs clear and readable across light/dark environments */
+  p {
+    @apply text-slate-700 dark:text-slate-400 transition-colors duration-200;
+  }
+
+  /* Force strong, label, and span text to be visible if they are not explicitly colored */
+  span, label, strong {
+    @apply text-slate-800 dark:text-slate-300;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* GLOBAL GLASS PANEL COMPONENT OVERRIDE
+    Forces cards to use a clean white/slate tint in light mode so your text pops, 
+    while preserving the premium dark-surface transparency in dark mode.
+  */
+  .glass-panel {
+    @apply bg-white/80 dark:bg-brand-surface/30 
+           backdrop-blur-md 
+           border border-slate-200/80 dark:border-slate-800/60 
+           shadow-sm dark:shadow-2xl 
+           transition-all duration-300;
+  }
+
+  /* Global background grid gridline visibility correction */
+  .bg-spatial-grid {
+    background-image: radial-gradient(rgba(1, 180, 244, 0.15) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  
+  .dark .bg-spatial-grid {
+    background-image: radial-gradient(rgba(1, 180, 244, 0.08) 1px, transparent 1px);
   }
 }

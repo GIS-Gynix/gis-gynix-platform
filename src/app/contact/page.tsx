@@ -61,7 +61,7 @@ function ContactFormContent() {
         alert(`Submission rejected by endpoint: ${result.message || "Unknown error"}`);
       }
     } catch (err) {
-      alert("Network pipeline offline. Check connection or email directly at operations@gisgynix.com");
+      alert("Network pipeline offline. Check connection or email directly at gisgynix@gmail.com");
     } finally {
       setIsSubmitting(false);
     }
@@ -194,7 +194,7 @@ function ContactFormContent() {
                 <CheckCircle2 size={36} />
               </div>
               <h3 className="text-2xl font-sans font-black text-slate-900 dark:text-white">Request Sent Successfully!</h3>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed mx-auto">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-sm leading-relaxed mx-auto">
                 Your specifications have been routed straight to our team. Our core engineering team will contact you shortly.
               </p>
               <button
@@ -224,45 +224,42 @@ function ContactFormContent() {
 
           <div className="space-y-5 font-sans">
             <div className="space-y-1">
-              {/* CHANGED: Swapped default text-slate-400 to text-slate-500 dark:text-slate-400 */}
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Client Identity</span>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 block">Client Identity</span>
               <p className="text-base font-extrabold text-slate-900 dark:text-white">
                 {formData.name || <span className="text-slate-500 font-normal italic">Awaiting entry...</span>}
               </p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Comms Target</span>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 block">Comms Target</span>
               <p className="text-base font-medium font-mono text-brand-cyan break-all">
                 {formData.email || <span className="text-slate-500 font-sans font-normal italic">Awaiting entry...</span>}
               </p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Target Domain Module</span>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 block">Target Domain Module</span>
               <p className="text-base font-bold text-slate-900 dark:text-brand-emerald">
                 {sectorNames[formData.sector]}
               </p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Development lifecycle</span>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 block">Development lifecycle</span>
               <p className="text-base font-bold text-slate-900 dark:text-white">
                 {timelineNames[formData.timeline]}
               </p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Project Requirements</span>
-              {/* CHANGED: Made summary output field content dark-mode aware */}
-              <p className="text-sm text-slate-800 dark:text-slate-300 leading-relaxed max-h-32 overflow-y-auto scrollbar-none bg-slate-950/5 dark:bg-slate-950/20 p-3 rounded-xl border border-slate-200 dark:border-slate-800/60 min-h-[64px]">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 block">Project Requirements</span>
+              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed max-h-32 overflow-y-auto scrollbar-none bg-slate-950/5 dark:bg-slate-950/20 p-3 rounded-xl border border-slate-200 dark:border-slate-800/60 min-h-[64px]">
                 {formData.details || <span className="text-slate-500 italic">Please outline what you need...</span>}
               </p>
             </div>
           </div>
         </div>
       </div>
-
     </section>
   );
 }
@@ -274,12 +271,12 @@ export default function ContactPage() {
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-brand-surface/50 backdrop-blur-md">
           <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan" />
           <span className="text-[11px] font-mono uppercase tracking-widest text-slate-600 dark:text-slate-400">
-            Contact Channels
+            Secure Inbound Pipeline
           </span>
         </div>
         <h1 className="text-4xl sm:text-5xl font-sans font-black text-slate-900 dark:text-white tracking-tight">
-          Contact Our Team <br />
-          <span className="bg-clip-text text-transparent bg-gradient-spatial">Scope Your Project Specifications</span>
+          Retain Spatial Engineers <br />
+          <span className="bg-clip-text text-transparent bg-gradient-spatial">Initialize System Calibration</span>
         </h1>
       </section>
 
