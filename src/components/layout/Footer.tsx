@@ -69,7 +69,7 @@ export default function Footer() {
             <span className="font-extrabold text-lg uppercase tracking-wider text-white">GIS Gynix</span>
           </div>
           <p className="text-sm leading-relaxed text-slate-400 max-w-sm">
-            International tier spatial engineering collective specializing in real-time Cloud WebGIS deployment, modern vector-tile optimization architectures, and zoning intelligence orchestration models.
+            We help organizations transform spatial data into actionable insights through real-time Cloud WebGIS platforms, high-performance mapping technologies, and smart zoning intelligence solutions.
           </p>
           <div className="pt-2 space-y-2.5 text-xs font-mono">
             <div className="flex items-center space-x-2">
@@ -160,7 +160,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-slate-600">
-        <p>&copy; {new Date().getFullYear()} GIS Gynix. All rights engineered internationally.</p>
+        <p>&copy; {new Date().getFullYear()} GIS Gynix. All rights reserved.</p>
         <div className="flex space-x-6 mt-4 sm:mt-0">
           <Link href="#" prefetch={false} className="hover:text-slate-400">Security Architecture</Link>
           <Link href="#" prefetch={false} className="hover:text-slate-400">Terms of Deployment</Link>
