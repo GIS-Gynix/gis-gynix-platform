@@ -14,17 +14,17 @@ export default function Footer() {
     solutions: [
       { name: "Zoning Intelligence", href: "/zoning-intelligence" },
       { name: "WebGIS Platforms", href: "/webgis-solutions" },
-      { name: "Spatial Data Science", href: "/services" },
-      { name: "Remote Sensing & AI", href: "/services" },
+      { name: "Geo-Spatial AI", href: "/services" },
+      { name: "GIS & Remote Sensing", href: "/services" },
     ],
     resources: [
-      { name: "Pakistan GIS Data Portal", href: "/data-portal" },
+      { name: "GIS Data Portal", href: "/data-portal" },
       { name: "Geospatial Articles", href: "/blog" },
-      { name: "Developer Tools", href: "#" }, 
+      { name: "Developer Tools", href: "/services" }, 
     ],
     company: [
       { name: "About Corporate Ecosystem", href: "/about" },
-      { name: "Project Portfolio Hub", href: "/portfolio" },
+      { name: "Portfolio", href: "/portfolio" },
       { name: "Contact Us Now", href: "/contact" },
     ],
   };
