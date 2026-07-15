@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="spatial-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4" /> <stop offset="100%" stop-color="#10b981" /> </linearGradient>
+  </defs>
+
+  <g transform="translate(10, 10)">
+    <polygon points="40,5 75,25 75,65 40,85 5,65 5,25" fill="none" stroke="url(#spatial-gradient)" stroke-width="2.5" opacity="0.4" />
+    
+    <polygon points="40,15 65,28 40,41 15,28" fill="none" stroke="url(#spatial-gradient)" stroke-width="2" />
+    
+    <path d="M 15,40 L 40,53 L 65,40" fill="none" stroke="url(#spatial-gradient)" stroke-width="2" />
+    
+    <line x1="40" y1="41" x2="40" y2="72" stroke="url(#spatial-gradient)" stroke-width="2.5" />
+    <circle cx="40" cy="72" r="4.5" fill="#10b981" />
+    <circle cx="15" cy="28" r="3.5" fill="#06b6d4" />
+    <circle cx="65" cy="28" r="3.5" fill="#06b6d4" />
+  </g>
+
+  <text x="105" y="52" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="34" letter-spacing="4" fill="#FFFFFF">GIS GYNIX</text>
+  
+  <text x="107" y="75" font-family="monospace, Courier" font-weight="700" font-size="11" letter-spacing="6.5" fill="#06b6d4">SPATIAL INTELLIGENCE</text>
+</svg>

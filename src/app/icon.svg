@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="fav-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="110" fill="#020617" />
+  
+  <g transform="translate(56, 56) scale(5)">
+    <polygon points="40,5 75,25 75,65 40,85 5,65 5,25" fill="none" stroke="url(#fav-gradient)" stroke-width="3" opacity="0.3" />
+    
+    <polygon points="40,15 65,28 40,41 15,28" fill="none" stroke="url(#fav-gradient)" stroke-width="2.5" />
+    
+    <path d="M 15,40 L 40,53 L 65,40" fill="none" stroke="url(#fav-gradient)" stroke-width="2.5" />
+    <line x1="40" y1="41" x2="40" y2="72" stroke="url(#fav-gradient)" stroke-width="3" />
+    
+    <circle cx="40" cy="72" r="5" fill="#10b981" />
+    <circle cx="15" cy="28" r="4" fill="#06b6d4" />
+    <circle cx="65" cy="28" r="4" fill="#06b6d4" />
+  </g>
+</svg>
