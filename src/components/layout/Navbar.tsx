@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Layers, Globe, ShieldAlert } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,11 +43,64 @@ export default function Navbar() {
           {/* Logo Branding */}
           <div className="flex-shrink-0 flex items-center space-x-3">
             <Link href="/" className="flex items-center space-x-3 group">
-              <div className="w-9 h-9 rounded bg-gradient-spatial p-[1px] flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-                <div className="w-full h-full bg-brand-dark rounded-[3px] flex items-center justify-center text-brand-emerald font-mono font-bold text-base">
-                  G
-                </div>
+              {/* Custom Spatial Node Vector Logo */}
+              <div className="relative w-9 h-9 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+                {/* Micro glow element on hover */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-brand-cyan to-brand-emerald rounded-lg opacity-0 group-hover:opacity-20 blur-sm transition-opacity duration-300" />
+                
+                <svg 
+                  viewBox="0 0 80 80" 
+                  className="w-8.5 h-8.5 relative z-10 drop-shadow-[0_0_6px_rgba(6,182,212,0.15)]"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    <linearGradient id="nav-logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#06b6d4" /> {/* Brand Cyan */}
+                      <stop offset="100%" stop-color="#10b981" /> {/* Brand Emerald */}
+                    </linearGradient>
+                  </defs>
+
+                  {/* Outer structural hexagon framework */}
+                  <polygon 
+                    points="40,5 75,25 75,65 40,85 5,65 5,25" 
+                    transform="scale(0.9) translate(4, 4)"
+                    fill="none" 
+                    stroke="url(#nav-logo-grad)" 
+                    strokeWidth="2" 
+                    className="opacity-40 group-hover:opacity-75 transition-opacity duration-300" 
+                  />
+                  
+                  {/* Top isometric data plane */}
+                  <polygon 
+                    points="40,15 65,28 40,41 15,28" 
+                    transform="scale(0.9) translate(4, 4)"
+                    fill="none" 
+                    stroke="url(#nav-logo-grad)" 
+                    strokeWidth="2" 
+                  />
+                  
+                  {/* Base connections & stems */}
+                  <path 
+                    d="M 15,40 L 40,53 L 65,40" 
+                    transform="scale(0.9) translate(4, 4)"
+                    fill="none" 
+                    stroke="url(#nav-logo-grad)" 
+                    strokeWidth="2" 
+                  />
+                  <line 
+                    x1="40" y1="41" x2="40" y2="72" 
+                    stroke="url(#nav-logo-grad)" 
+                    strokeWidth="2.5" 
+                  />
+                  
+                  {/* Spatial coordinate nodes */}
+                  <circle cx="40" cy="72" r="4.5" fill="#10b981" />
+                  <circle cx="17.5" cy="29" r="3" fill="#06b6d4" />
+                  <circle cx="62.5" cy="29" r="3" fill="#06b6d4" />
+                </svg>
               </div>
+
+              {/* Text Signature */}
               <div className="flex flex-col">
                 <span className="font-extrabold text-base uppercase tracking-wider text-white">
                   GIS Gynix
