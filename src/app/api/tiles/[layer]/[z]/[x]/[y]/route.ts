@@ -43,9 +43,11 @@ export async function GET(request: Request, context: RouteContext) {
         SELECT 
           id,
           ST_AsMVTGeom(
-            ST_Transform(geom, 3857),
+            ST_Transform(ST_MakeValid(geom), 3857),
             ST_TileEnvelope(${z}, ${x}, ${y}),
-            4096, 64, true
+            4096, 
+            256, -- Increased buffer size to fix edge slicing gaps
+            true
           ) AS geom
         FROM public."${layer}"
         WHERE ST_Intersects(
