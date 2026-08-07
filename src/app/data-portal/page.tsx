@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import confetti from "canvas-confetti"; // Assumes your setup uses canvas-confetti
+import confetti from "canvas-confetti";
 import { 
-  Database, Search, Download, Filter, 
-  Layers, Map, Info, Calendar, HardDrive, Binary, ShieldAlert 
+  Search, Download, 
+  Layers, Map, Calendar, HardDrive, Binary, ShieldAlert 
 } from "lucide-react";
 
 interface SpatialLayer {
@@ -95,7 +95,7 @@ export default function DataPortalPage() {
       return;
     }
 
-    // UPDATED: Standard location routing to trigger on-the-fly zip streaming pipeline
+    // Standard location routing to trigger on-the-fly zip streaming pipeline
     window.location.href = `/api/download?table=${layer.table_name}`;
   };
 
@@ -111,8 +111,26 @@ export default function DataPortalPage() {
     return matchesSearch && matchesCategory;
   });
 
+  // Dynamic Schema.org structured data for datasets
+  const datasetJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "DataCatalog",
+    "name": "GIS Gynix Free GIS Data Portal",
+    "description": "Open access spatial repository offering free GIS data, vector boundaries, hydrology layers, and administrative boundary downloads for Pakistan and global regions.",
+    "url": "https://gis-gynix-platform.vercel.app/data-portal",
+    "provider": {
+      "@type": "Organization",
+      "name": "GIS Gynix"
+    }
+  };
+
   return (
     <div className="w-full bg-spatial-grid min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      {/* Schema.org Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }}
+      />
       
       {/* Informative Portal Header */}
       <section className="max-w-4xl mx-auto text-center mt-8 mb-12 space-y-4">
@@ -126,12 +144,14 @@ export default function DataPortalPage() {
             Open-Source Geo-Warehouse Registry
           </span>
         </motion.div>
+        
         <h1 className="text-4xl sm:text-5xl font-sans font-black text-slate-900 dark:text-white tracking-tight">
-          Pakistan GIS Data Portal <br />
+          Free GIS Data Portal & Spatial Datasets<br />
           <span className="bg-clip-text text-transparent bg-gradient-spatial">Analysis-Ready Repositories</span>
         </h1>
+        
         <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
-          Download curated vector boundaries, infrastructure networks, and hydrology features. All files include projection configurations and structural attribute schemas.
+          Access and download free GIS data, curated vector administrative boundaries, infrastructure networks, and hydrology features. All datasets include projection configurations and structural attribute schemas ready for QGIS, ArcGIS, and PostGIS analysis.
         </p>
       </section>
 
@@ -142,7 +162,7 @@ export default function DataPortalPage() {
           <Search className="absolute left-4 text-slate-400 pointer-events-none" size={16} />
           <input
             type="text"
-            placeholder="Search spatial index names..."
+            placeholder="Search free GIS datasets..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-brand-surface/40 font-sans text-sm outline-none focus:border-brand-cyan/60 dark:text-white transition-colors"
@@ -169,12 +189,13 @@ export default function DataPortalPage() {
 
       {/* Main Metadata Catalog Stack */}
       <section className="max-w-5xl mx-auto space-y-6 mb-20">
+        <h2 className="sr-only">Available Spatial Layer Catalog</h2>
         
         {/* Connection Loading State */}
         {loading && (
           <div className="text-center py-20 text-slate-400 font-medium font-sans animate-pulse flex justify-center items-center space-x-3">
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-brand-emerald"></div>
-            <span>Synchronizing Live PostGIS Registries...</span>
+            <span>Loading Data...</span>
           </div>
         )}
 
@@ -215,7 +236,6 @@ export default function DataPortalPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400">
                   <div className="flex items-center space-x-1.5">
                     <Binary size={12} className="text-brand-accent" />
-                    {/* UPDATED: Displays zip encoding information */}
                     <span>Zipped GeoJSON Stream</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
@@ -240,7 +260,7 @@ export default function DataPortalPage() {
                   className="w-full md:w-auto px-6 py-4 rounded-xl bg-slate-900 dark:bg-brand-muted border border-slate-800 text-white dark:text-slate-200 font-sans font-bold text-sm tracking-wide flex items-center justify-center space-x-2 hover:bg-brand-cyan hover:text-brand-dark dark:hover:bg-gradient-spatial dark:hover:text-brand-dark transition-all duration-200 shadow-md shrink-0 group/btn"
                 >
                   <Download size={16} className="transform group-hover/btn:translate-y-0.5 transition-transform" />
-                  <span>Download Asset Package</span>
+                  <span>Download Free Asset</span>
                 </button>
               ) : (
                 <button
@@ -258,7 +278,7 @@ export default function DataPortalPage() {
 
           {!loading && !error && filteredData.length === 0 && (
             <div className="text-center py-12 font-sans text-slate-500 text-sm">
-              No matching geospatial registries indexed. Broaden your search criteria parameters.
+              No matching geospatial datasets indexed. Broaden your search criteria parameters.
             </div>
           )}
         </AnimatePresence>
